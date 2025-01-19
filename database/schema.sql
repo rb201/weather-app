@@ -2,20 +2,22 @@
 -- DROP TABLE IF EXISTS hourly_weather
 -- DROP TABLE IF EXISTS forecast
 
-CREATE TABLE cities (
+CREATE TABLE IF NOT EXISTS cities (
+    id INTEGER PRIMARY KEY,
     name TEXT NOT NULL,
     state TEXT NOT NULL,
-    timezone TEXT,
-    period_of_day TEXT,
-    time_period,
+    coordinates TEXT NOT NULL,
     forecast_url TEXT NOT NULL,
     hourly_url TEXT NOT NULL,
-    coordinates TEXT 
-)
+    country TEXT,
+    timezone TEXT
+);
 
-CREATE TABLE hourly_weather (
-    start_time TEXT NOT NULL,
-    end_time TEXT NOT NULL,
+CREATE TABLE IF NOT EXISTS hourly_weather (
+    id INTEGER PRIMARY KEY,
+    city_id INTEGER NOT NULL,
+    start_time TEXT,
+    end_time TEXT,
     termperature INTEGER,
     termperature_unit TEXT,
     precipitation_probability INTEGER,
@@ -24,17 +26,21 @@ CREATE TABLE hourly_weather (
     wind_speed TEXT,
     wind_direction TEXT,
     forcast_short_desc TEXT,
-)
+    FOREIGN KEY (city_id) REFERENCES cities(id)
+);
 
-CREATE TABLE forecast (
+CREATE TABLE IF NOT EXISTS forecast (
+    id INTEGER PRIMARY KEY,
+    city_id INTEGER NOT NULL,
     time_of_day_desc TEXT,
-    start_time TEXT NOT NULL,
-    end_time TEXT NOT NULL,
-    temperature INTEGER NOT NULL,
-    termperature_unit TEXT NOT NULL,
+    start_time TEXT,
+    end_time TEXT,
+    temperature INTEGER,
+    termperature_unit TEXT,
     precipitation_probability INTEGER,
     wind_speed TEXT,
     wind_direction TEXT,
     forcast_short_desc TEXT,
     forcast_long_desc TEXT,
-)
+    FOREIGN KEY (city_id) REFERENCES cities(id)
+);
