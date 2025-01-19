@@ -1,0 +1,6 @@
+# Python
+.venv
+
+
+# Database
+*.sqlite
