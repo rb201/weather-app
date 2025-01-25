@@ -1,10 +1,18 @@
+import dotenv
 import json
 import os
+import requests
 import sqlite3
+import sys
 
 from contextlib import contextmanager
 from geopy.geocoders import Nominatim
 
+CWD = os.path.dirname(os.path.abspath(__file__))
+ENV_FILE_PATH = os.path.join(CWD, ".env")
+
+dotenv.load_dotenv()
+API_KEY = os.getenv("API_KEY")
 
 class DatabaseConnection:
     def __init__(self, db_path: str):
@@ -28,14 +36,13 @@ class DatabaseConnection:
                 try:
                     conn.close()
                 except sqlite3.Error as slqe:
-                    print("Error closing sql connection")
+                    print(f"Error closing sql connection: {sqle}")
     
 
 class WeatherFetcher:
     def __init__(
         self,
         db_path: str,
-        # coordinates: list = None,
         latitude: float = None,
         longitude: float = None,
         city: str = None,
@@ -62,7 +69,7 @@ class WeatherFetcher:
         longitude: float,
         hourly_url: str,
         forecast_url: str
-    ):
+    ) -> int:
         db_conn = self.db.get_connection()
 
         with db_conn as conn:
@@ -76,8 +83,7 @@ class WeatherFetcher:
                         name, state, country, timezone,
                         longitude, latitude, hourly_url, forecast_url
                     )
-                    VALUES
-                    (?, ?, ?, ?, ?, ?, ?, ?)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
                     """
                 )
 
@@ -90,22 +96,82 @@ class WeatherFetcher:
                 )
 
                 conn.commit()
+
+                city_id = cur.lastrowid
             except sqlite3.Error as sqle:
                 print(f"Error adding city to database.cities: {sqle}")
 
+        return city_id
 
-    def get_current_weather(self, ):
-        pass
+    def get_current_weather(self):
+        url = f"https://api.openweathermap.org/data/2.5/weather?lat={self.latitude}&lon={self.longitude}&units=metric&appid={API_KEY}"
+
+        try:
+            res = requests.get(url)
+            res.raise_for_status()
+        except requests.HTTPError as http_error:
+            print(f"HTTP error: {http_error}")
+        except Exception as err:
+            print(f"Error has occured: {err}")
+
+        # with open("owm_current.json", 'r') as f:
+        #     res = json.load(f)
+
+        current_weather_data = json.loads(res.text)
+        print(current_weather_data)
+        # current_weather_data = res
+        parsed_current_weather_data = {
+            "temperature": current_weather_data.get("main", {}).get("temp", None),
+            "apparent_temperature": current_weather_data.get("main", {}).get("feels_like", None),
+            "temperature_min": current_weather_data.get("main", {}).get("temp_min", None),
+            "temperature_max": current_weather_data.get("main", {}).get("temp_max", None),
+            "pressure": current_weather_data.get("main", {}).get("pressure", None),
+            "humidity": current_weather_data.get("main", {}).get("humidity", None),
+            "forecast_main_description": current_weather_data.get("weather", {})[0].get("main"),
+            "forecast_short_description": current_weather_data.get("weather", {})[0].get("description"),
+            "sunrise": current_weather_data.get("sys", {}).get("sunrise", None),
+            "sunset": current_weather_data.get("sys", {}).get("sunset", None),
+            "timestamp_calc": current_weather_data.get("dt", None),
+            "wind_speed": current_weather_data.get("wind", {}).get("speed", None),
+            "wind_direction": current_weather_data.get("wind", {}).get("deg", None),
+            "wind_gust": current_weather_data.get("wind", {}).get("gust", None),
+            "rain": current_weather_data.get("rain", None),
+            "snow": current_weather_data.get("snow", None),
+            "visibility": current_weather_data.get("visibility", None),
+        }
+        timezone = parsed_current_weather_data.get("timezone")
+
+        if self.city is None and self.state is None:
+            self.get_city_from_lon_lat()
+
+        city_id = self.is_city_in_db()
+
+        if not city_id:
+            city_id = self.add_city_to_db(
+                name = self.city,
+                state = self.state,
+                country = self.country,
+                timezone = timezone,
+                latitude = self.latitude,
+                longitude = self.longitude,
+                hourly_url = url,
+                forecast_url = ""
+            )
+
+        self.write_current_weather_to_db(
+            city_id = city_id,
+            data = parsed_current_weather_data
+        )
 
 
-    def get_city_from_lon_lat(self, latitude: float, longitude: float):
+    def get_city_from_lon_lat(self):
         geolocater = Nominatim(user_agent = 'my-weather-app')
 
-        location = geolocater.reverse(str(latitude) + ',' + str(longitude))
+        location = geolocater.reverse(str(self.latitude) + ',' + str(self.longitude))
 
-        city = location.raw['address']['city']
-        state = location.raw['address']['state']
-        return city, state
+        self.city = location.raw['address']['city']
+        self.state = location.raw['address']['state']
+        self.country = location.raw['address']['country_code']
     
     
     def get_coor_from_city_state(self, city: str, state: str):
@@ -113,10 +179,10 @@ class WeatherFetcher:
         pass
 
 
-    def if_city_in_db(self, city, state) -> bool:
+    def is_city_in_db(self) -> bool:
         db_conn = self.db.get_connection()
 
-        info = [city, state]
+        info = [self.city, self.state]
 
         with db_conn as conn:
             try:
@@ -124,42 +190,47 @@ class WeatherFetcher:
                 
                 query = (
                     """
-                    SELECT name, state
+                    SELECT id, name, state
                     FROM cities
                     WHERE name = ? and state = ?
                     """
                 )
 
-                cur.execute(query, *info)
+                cur.execute(query, info)
 
                 city_in_db = cur.fetchone()
-
-                return False if not city_in_db else True
-
             except sqlite3.Error as sqle:
                 print(f"Error has occured: {sqle}")
 
+        return False if not city_in_db else city_in_db[0]
 
-    def write_current_weather_to_db(self, city, state, data):
+    def write_current_weather_to_db(self, city_id: int, data: dict):
         db_conn = self.db.get_connection()
         
-        temperature = data("temperature")
+        temperature = data["temperature"]
         apparent_temperature = data["apparent_temperature"]
         temperature_min = data["temperature_min"]
         temperature_max = data["temperature_max"]
         pressure = data["pressure"]
-        humidty = data["humidity"]
-        forecast_main_description = data["forecast_main_description"],
-        forecast_short_description = data["forecast_short_description"],
+        humidity = data["humidity"]
+        forecast_main_description = data["forecast_main_description"]
+        forecast_short_description = data["forecast_short_description"]
         sunrise = data["sunrise"]
         sunset = data["sunset"]
-        timestamp_calc = data["timestamp_calc"],
-        wind_speed = data["wind_speed"],
-        wind_gust = data["wind_gust"],
-        rain = data["rain"],
-        snow = data["snow"],
-        visibility = data["visibility"],
+        timestamp_calc = data["timestamp_calc"]
+        wind_speed = data["wind_speed"]
+        wind_direction = data["wind_direction"]
+        wind_gust = data["wind_gust"]
+        rain = data["rain"]
+        snow = data["snow"]
+        visibility = data["visibility"]
         
+        parsed_data = [
+            temperature, apparent_temperature, temperature_min, temperature_max, pressure,
+            humidity, forecast_main_description, forecast_short_description, sunrise, sunset,
+            timestamp_calc, wind_speed, wind_direction, wind_gust, rain, snow, visibility,
+        ]
+
         with db_conn as conn:
             try:
                 cur = conn.cursor()
@@ -172,91 +243,31 @@ class WeatherFetcher:
                         temperature_min,
                         temperature_max,
                         pressure,
-                        humidty,
+                        humidity,
                         forecast_main_description,
                         forecast_short_description,
                         sunrise,
                         sunset,
                         timestamp_calc,
                         wind_speed,
+                        wind_direction,
                         wind_gust,
                         rain,
                         snow,
-                        visibility)
-                    VALUES (
-                        (SELECT id FROM cities WHERE name = {city} and state = {state}),
-                        ?, ?, ?, ?, ?,
-                        ?, ?, ?, ?, ?,
-                        ?, ?, ?, ?, ?,
-                        ?, ?,
+                        visibility
                     )
-                """, data)
+                    VALUES (
+                        ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
+                    )
+                """, (city_id, *parsed_data))
 
+                conn.commit()
             except sqlite3.Error as sqle:
                 print(sqle)
 
 
 db_file = "weather.db"
+lat, long = 40.719074, -74.050552
 
-weather_obj = WeatherFetcher(db_file)
-# jc_forecast_file = "forcast.json"
-# jc_forecast_hourly_file = "forcast_hourly.json"
-jc_current_file = "owm_current.json"
-
-# jcff = os.path.dirname()
-# jcff = os.path.join(os.path.dirname('.'), jc_forecast_file)
-# print(os.getcwd())
-jcff = os.path.join(os.path.dirname('.'), jc_current_file)
-
-with open(jcff, 'r') as f:
-    data = json.load(f)
-    
-if not data:
-    data = {}
-
-# print(jc_forecast_data)
-# jcf_start_time = data['weather']
-parsed_data = {
-    "temperature": data.get("main", {}).get("temp", None),
-    "apparent_temperature": data.get("main", {}).get("feels_like", None),
-    "temperature_min": data.get("main", {}).get("temp_min", None),
-    "temperature_max": data.get("main", {}).get("temp_max", None),
-    "pressure": data.get("main", {}).get("pressure", None),
-    "humidty": data.get("main", {}).get("humidity", None),
-    "forecast_main_description": data.get("weather", {})[0].get("main"),
-    "forecast_short_description": data.get("weather", {})[0].get("description"),
-    "sunrise": data.get("sys", {}).get("sunrise", None),
-    "sunset": data.get("sys", {}).get("sunset", None),
-    "timestamp_calc": data.get("dt", None),
-    "wind_speed": data.get("wind", {}).get("speed", None),
-    "wind_gust": data.get("wind", {}).get("gust", None),
-    "rain": data.get("rain", None),
-    "snow": data.get("snow", None),
-    "visibility": data.get("visibility", None),
-    "timezone": data.get("timezone", None)
-}
-
-# print(jcf_start_time)
-# write_to_db(parsed_data)
-latitude = 40.719074
-longitude = -74.050552
-timezone = parsed_data["timezone"]
-base_url = f"https://api.openweathermap.org/data/2.5/weather?lat={latitude}&lon={longitude}&units=metric&appid=API_KEY"
-country = "US"
-# city, state = get_city_from_lon_lat(lat, lon)
-city = "Jersey City"
-state = "New Jersey"
-
-city_in_db = if_city_in_db(city, state)
-
-if not city_in_db:
-    add_city_to_db(
-        name = city,
-        state = state,
-        country = country,
-        longitude = longitude,
-        latitude = latitude,
-        timezone = timezone,
-        hourly_url = base_url,
-        forecast_url = "https://example.com/forecast"
-    )
+weather_obj = WeatherFetcher(db_file, longitude = long, latitude = lat)
+weather_obj.get_current_weather()
