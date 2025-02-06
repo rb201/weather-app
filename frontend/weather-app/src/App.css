@@ -1,0 +1,144 @@
+#root {
+  /* max-width: 1280px; */
+  width: 100%;
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: center;
+}
+
+div {
+  font-family: "Montserrat";
+  color: white;
+}
+
+.weather-container__current {
+  border-style: solid;
+  border-width: 1px;
+  border-radius: 16px;
+  box-shadow: 1px 1px 16px 3px rgb(170, 168, 159);
+  /* background-color: rgb(160, 154, 196); */
+  background-color:rgb(36, 55, 77)
+}
+
+.weather-container__current-title-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+@media (min-width: 40rem) {
+  .weather-container__current-title-bar {
+  }
+}
+
+.weather-container__current-title {
+  margin-left: 1.5rem;
+}
+
+.weather-container__current-title-bar-tenp-button {
+  padding: .25rem .25rem;
+  height: 30px;
+  margin-right: 1.5rem;
+}
+
+.weather-container__current-main {
+  padding: 1rem 0;
+  display: flex;
+}
+
+.weather-container__current-main > p {
+  margin: 0;
+}
+
+.weather-container__current-primary-info{
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  margin: .5rem 3rem;
+  align-items: center;
+}
+
+.weather-container__current-main-location {
+
+}
+
+.weather-container__current-logo {
+  height: 5rem;
+  width: 5rem;
+  /* margin: 1rem; */
+
+}
+
+/* .weather-container__current-main-temp {
+
+} */
+
+.weather-container__current-main-desc {
+  /* color: rgb(25, 116, 116); */
+  font-size: 1.5rem;
+  margin: 1.125rem;
+}
+
+.weather-container__current-main-temp, 
+.weather-container__current-main-feels-like {
+  /* color: rgb(25, 116, 116); */
+  color: white;
+  margin: 0;
+}
+
+.weather-container__current-secondary-infos {
+  display: flex;
+  height: 250px;
+  margin: 1rem 0;
+  flex-direction: column;
+  /* justify-content: flex-start; */
+  justify-content: flex-start;
+  align-items: flex-start;
+  /* align-content: middle; */
+  flex-wrap: wrap;
+  margin: 1rem;
+}
+
+.weather-container__current-secondary-info {
+  display: flex;
+  /* margin: 1rem 1rem; */
+}
+
+.weather-container__current-secondary-info-item {
+  margin: 1rem 0;
+}
+/* .logo {
+  height: 6em;
+  padding: 1.5em;
+  will-change: filter;
+  transition: filter 300ms;
+}
+.logo:hover {
+  filter: drop-shadow(0 0 2em #646cffaa);
+}
+.logo.react:hover {
+  filter: drop-shadow(0 0 2em #61dafbaa);
+} */
+
+/* @keyframes logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  a:nth-of-type(2) .logo {
+    animation: logo-spin infinite 20s linear;
+  }
+} */
+
+/* .card {
+  padding: 2em;
+}
+
+.read-the-docs {
+  color: #888;
+} */
