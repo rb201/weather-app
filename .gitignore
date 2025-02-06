@@ -9,3 +9,7 @@
 
 # Env files
 .env
+
+
+# React
+**/node_modules
