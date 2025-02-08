@@ -4,6 +4,7 @@ import { useState } from "react";
 import "./App.css";
 
 import Navigation from "./components/Nav/Nav";
+import WeatherSection from "./components/WeatherSection/WeatherSection";
 
 import sunIcon from "./assets/weather-icons/sun.png";
 
@@ -14,25 +15,11 @@ function App() {
     <>
       <div>
         <Navigation />
-        {/* <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a> */}
+        <WeatherSection />
+
       </div>
       <div className="weather-container__current">
-        <div className="weather-alert">
-          {/* <h3>alert</h3> */}
-        </div>
-
-        <div className="weather-container__current-title-bar">
-          <h3 className="weather-container__current-title">Current Weather</h3>
-          <button className="weather-container__current-title-bar-tenp-button">
-            C to F
-          </button>
-        
-        </div>
+        <div className="weather-alert">{/* <h3>alert</h3> */}</div>
         <div className="weather-container__current-main">
           <div className="weather-container__current-primary-info">
             <p className="weather-container__current-main-location">
@@ -58,19 +45,44 @@ function App() {
                 73%
               </p>
             </div>
-            <div>
-              <p className="weather-container__current-secondary-info">Wind</p>
-              <p className="weather-container__current-secondary-info">3</p>
+            <div className="weather-container__current-secondary-info">
+              <p className="weather-container__current-secondary-info-item">
+                Wind
+              </p>
+              <p className="weather-container__current-secondary-info-item">
+                3
+              </p>
             </div>
-            <p className="weather-container__current-secondary-info">
-              Pressure
-            </p>
-            <p className="weather-container__current-secondary-info">
-              Visibility
-            </p>
-            <p className="weather-container__current-secondary-info">Sunset</p>
-            <p className="weather-container__current-secondary-info">Rain</p>
-            <p className="weather-container__current-secondary-info">Snow</p>
+            <div className="weather-container__current-secondary-info">
+              <p className="weather-container__current-secondary-info-item">
+                Pressure
+              </p>
+              <p className="weather-container__current-secondary-info-item">1013 hPa</p>
+            </div>
+            <div className="weather-container__current-secondary-info">
+              <p className="weather-container__current-secondary-info-item">
+                Visibility
+              </p>
+              <p className="weather-container__current-secondary-info-item">
+                10km
+              </p>
+            </div>
+            <div className="weather-container__current-secondary-info">
+              <p className="weather-container__current-secondary-info-item">
+                Sunset
+              </p>
+              <p className="weather-container__current-secondary-info-item">
+                6:45pm
+              </p>
+            </div>
+            <div className="weather-container__current-secondary-info">
+              <p className="weather-container__current-secondary-info-item">Rain</p>
+              <p className="weather-container__current-secondary-info-item">1 inch</p>
+            </div>
+            {/* <div>
+              <p className="weather-container__current-secondary-info">Snow</p>
+              <p className="weather-container__current-secondary-info">Snow</p>
+            </div> */}
           </div>
         </div>
         <div className="weather-container__hourly">
