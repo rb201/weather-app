@@ -15,7 +15,6 @@ function App() {
     <>
       <div>
         <Navigation />
-        <WeatherSection />
 
       </div>
       <div className="weather-container__current">
@@ -36,7 +35,9 @@ function App() {
               Feels like 18°C
             </p>
           </div>
-          <div className="weather-container__current-secondary-infos">
+          <WeatherSection />
+
+          {/* <div className="weather-container__current-secondary-infos">
             <div className="weather-container__current-secondary-info">
               <p className="weather-container__current-secondary-info-item">
                 Humidity
@@ -79,11 +80,7 @@ function App() {
               <p className="weather-container__current-secondary-info-item">Rain</p>
               <p className="weather-container__current-secondary-info-item">1 inch</p>
             </div>
-            {/* <div>
-              <p className="weather-container__current-secondary-info">Snow</p>
-              <p className="weather-container__current-secondary-info">Snow</p>
-            </div> */}
-          </div>
+          </div> */}
         </div>
         <div className="weather-container__hourly">
           <p>hourly</p>
