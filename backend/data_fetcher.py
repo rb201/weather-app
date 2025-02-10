@@ -4,6 +4,7 @@ import os
 import requests
 import sqlite3
 import sys
+import time
 
 from contextlib import contextmanager
 from geopy.geocoders import Nominatim
@@ -192,16 +193,16 @@ class WeatherFetcher:
                 print(f"Error has occurred {sqle}")
 
         cur_weather_obj = {
-            "temperature": query_data[2],
-            "apparent_temperature": query_data[3],
-            "temperature_min": query_data[4],
-            "temperature_max": query_data[5],
-            "pressure": query_data[6],
-            "humidity": query_data[7],
+            "temperature": round(query_data[2], 1),
+            "apparent_temperature": round(query_data[3], 1),
+            "temperature_min": round(query_data[4], 1),
+            "temperature_max": round(query_data[5], 1),
+            "pressure": str(query_data[6]) + " hPa",
+            "humidity": str(query_data[7]) + "%",
             "forecast_main_description": query_data[8],
             "forecast_short_description": query_data[9],
-            "sunrise": query_data[10],
-            "sunset": query_data[11],
+            "sunrise": time.strftime('%H:%M:%S', time.localtime(query_data[10])),
+            "sunset": time.strftime('%H:%M:%S', time.localtime(query_data[11])),
             "timestamp_calc": query_data[12],
             "wind_speed": query_data[13],
             "wind_direction": query_data[14],
