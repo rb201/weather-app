@@ -30,6 +30,5 @@ async def get_current_weather():
     
     wf = WeatherFetcher("weather.db", city = city, state = state)
     current_weather_data = wf.get_current_weather_from_db()
-    
+
     return current_weather_data
-    
