@@ -1,7 +1,8 @@
 import os
 import sqlite3
 
-CWD = os.path.dirname(os.path.abspath(__file__))
+# CWD = os.path.dirname(os.path.abspath(__file__))
+CWD = os.path.dirname(os.path.abspath("backend"))
 
 DATABASE = os.path.join(CWD, "weather.db")
 SCHEMA_FILE = os.path.join(CWD, "schema.sql")

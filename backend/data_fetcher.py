@@ -55,8 +55,8 @@ class WeatherFetcher:
         self.db = DatabaseConnection(db_path)
         self.latitude = latitude
         self.longitude = longitude
-        self.city = city
-        self.state = state
+        self.city = city.lower() if city else city
+        self.state = state.lower() if state else state
 
 
     def add_city_to_db(
@@ -67,8 +67,8 @@ class WeatherFetcher:
         timezone: str,
         latitude: float,
         longitude: float,
+        current_url: str,
         hourly_url: str,
-        forecast_url: str
     ) -> int:
         db_conn = self.db.get_connection()
 
@@ -81,7 +81,7 @@ class WeatherFetcher:
                     INSERT INTO cities
                     (
                         name, state, country, timezone,
-                        longitude, latitude, hourly_url, forecast_url
+                        longitude, latitude, current_url, hourly_url
                     )
                     VALUES (?, ?, ?, ?, ?, ?, ?, ?)
                     """
@@ -91,7 +91,7 @@ class WeatherFetcher:
                     add_city_query,
                     (
                         name, state, country, timezone,
-                        longitude, latitude, hourly_url, forecast_url
+                        longitude, latitude, current_url, hourly_url
                     )
                 )
 
@@ -119,9 +119,9 @@ class WeatherFetcher:
         #     res = json.load(f)
 
         current_weather_data = json.loads(res.text)
-        print(current_weather_data)
-        # current_weather_data = res
+
         parsed_current_weather_data = {
+            "weather_code": current_weather_data.get("weather", {})[0].get("id"),
             "temperature": current_weather_data.get("main", {}).get("temp", None),
             "apparent_temperature": current_weather_data.get("main", {}).get("feels_like", None),
             "temperature_min": current_weather_data.get("main", {}).get("temp_min", None),
@@ -155,8 +155,8 @@ class WeatherFetcher:
                 timezone = timezone,
                 latitude = self.latitude,
                 longitude = self.longitude,
-                hourly_url = url,
-                forecast_url = ""
+                current_url = url,
+                hourly_url = "",
             )
 
         self.write_current_weather_to_db(
@@ -178,11 +178,11 @@ class WeatherFetcher:
                 cur = conn.cursor()
 
                 query = """
-                    SELECT hw.*
-                    FROM hourly_weather hw
-                    JOIN cities c on hw.city_id
-                    WHERE name = ? and state = ?
-                    ORDER BY hw.id DESC
+                    SELECT cw.*
+                    FROM current_weather cw
+                    JOIN cities c on cw.city_id == c.id
+                    WHERE c.name = ? and c.state = ?
+                    ORDER BY cw.city_id DESC
                     LIMIT 1
                 """
 
@@ -192,23 +192,24 @@ class WeatherFetcher:
                 print(f"Error has occurred {sqle}")
 
         cur_weather_obj = {
-            "temperature": round(query_data[2], 1),
-            "apparent_temperature": round(query_data[3], 1),
-            "temperature_min": round(query_data[4], 1),
-            "temperature_max": round(query_data[5], 1),
-            "pressure": str(query_data[6]) + " hPa",
-            "humidity": str(query_data[7]) + "%",
-            "forecast_main_description": query_data[8],
-            "forecast_short_description": query_data[9],
-            "sunrise": time.strftime('%H:%M:%S', time.localtime(query_data[10])),
-            "sunset": time.strftime('%H:%M:%S', time.localtime(query_data[11])),
-            "timestamp_calc": query_data[12],
-            "wind_speed": query_data[13],
-            "wind_direction": query_data[14],
-            "wind_gust": query_data[15],
-            "rain": query_data[16],
-            "snow": query_data[17],
-            "visibility": query_data[18]
+            "weather_code": query_data[2],
+            "temperature": round(query_data[3], 1),
+            "apparent_temperature": round(query_data[4], 1),
+            "temperature_min": round(query_data[5], 1),
+            "temperature_max": round(query_data[6], 1),
+            "pressure": str(query_data[7]) + " hPa",
+            "humidity": str(query_data[8]) + "%",
+            "forecast_main_description": query_data[9],
+            "forecast_short_description": query_data[10],
+            "sunrise": time.strftime('%H:%M:%S', time.localtime(query_data[11])),
+            "sunset": time.strftime('%H:%M:%S', time.localtime(query_data[12])),
+            "timestamp_calc": query_data[13],
+            "wind_speed": query_data[14],
+            "wind_direction": query_data[15],
+            "wind_gust": query_data[16],
+            "rain": query_data[17],
+            "snow": query_data[18],
+            "visibility": query_data[19]
         }
 
         return json.dumps(cur_weather_obj)
@@ -218,9 +219,9 @@ class WeatherFetcher:
 
         location = geolocater.reverse(str(self.latitude) + ',' + str(self.longitude))
 
-        self.city = location.raw['address']['city']
-        self.state = location.raw['address']['state']
-        self.country = location.raw['address']['country_code']
+        self.city = location.raw['address']['city'].lower()
+        self.state = location.raw['address']['state'].lower()
+        self.country = location.raw['address']['country_code'].lower()
     
     
     def get_coor_from_city_state(self, city: str, state: str):
@@ -256,6 +257,7 @@ class WeatherFetcher:
     def write_current_weather_to_db(self, city_id: int, data: dict):
         db_conn = self.db.get_connection()
         
+        weather_code = data["weather_code"]
         temperature = data["temperature"]
         apparent_temperature = data["apparent_temperature"]
         temperature_min = data["temperature_min"]
@@ -275,7 +277,7 @@ class WeatherFetcher:
         visibility = data["visibility"]
         
         parsed_data = [
-            temperature, apparent_temperature, temperature_min, temperature_max, pressure,
+            weather_code, temperature, apparent_temperature, temperature_min, temperature_max, pressure,
             humidity, forecast_main_description, forecast_short_description, sunrise, sunset,
             timestamp_calc, wind_speed, wind_direction, wind_gust, rain, snow, visibility,
         ]
@@ -285,8 +287,9 @@ class WeatherFetcher:
                 cur = conn.cursor()
 
                 cur.execute(f"""
-                    INSERT INTO hourly_weather (
+                    INSERT INTO current_weather (
                         city_id,
+                        weather_code,
                         temperature,
                         apparent_temperature,
                         temperature_min,
@@ -306,7 +309,7 @@ class WeatherFetcher:
                         visibility
                     )
                     VALUES (
-                        ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
+                        ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
                     )
                 """, (city_id, *parsed_data))
 

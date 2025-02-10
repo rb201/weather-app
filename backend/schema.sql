@@ -1,6 +1,6 @@
 DROP TABLE IF EXISTS cities;
-DROP TABLE IF EXISTS hourly_weather;
-DROP TABLE IF EXISTS forecast;
+DROP TABLE IF EXISTS current_weather;
+-- DROP TABLE IF EXISTS forecast;
 
 CREATE TABLE IF NOT EXISTS cities (
     id INTEGER PRIMARY KEY,
@@ -10,13 +10,14 @@ CREATE TABLE IF NOT EXISTS cities (
     longitude REAL NOT NULL,
     latitude REAL NOT NULL,
     timezone TEXT,
-    hourly_url TEXT NOT NULL,
-    forecast_url TEXT NOT NULL
+    current_url TEXT NOT NULL,
+    hourly_url TEXT NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS hourly_weather (
+CREATE TABLE IF NOT EXISTS current_weather (
     id INTEGER PRIMARY KEY,
     city_id INTEGER NOT NULL,
+    weather_code TEXT NOT NULL,
     temperature INTEGER,
     apparent_temperature INTEGER,
     temperature_min INTEGER,
