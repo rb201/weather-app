@@ -22,6 +22,7 @@ CREATE TABLE IF NOT EXISTS current_weather (
     apparent_temperature INTEGER,
     temperature_min INTEGER,
     temperature_max INTEGER,
+    clouds INTEGER,
     pressure INTEGER,
     humidity INTEGER,
     forecast_main_description TEXT,

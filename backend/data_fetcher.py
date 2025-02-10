@@ -126,10 +126,11 @@ class WeatherFetcher:
             "apparent_temperature": current_weather_data.get("main", {}).get("feels_like", None),
             "temperature_min": current_weather_data.get("main", {}).get("temp_min", None),
             "temperature_max": current_weather_data.get("main", {}).get("temp_max", None),
+            "clouds": current_weather_data.get("clouds", {}).get("all", None),
             "pressure": current_weather_data.get("main", {}).get("pressure", None),
             "humidity": current_weather_data.get("main", {}).get("humidity", None),
-            "forecast_main_description": current_weather_data.get("weather", {})[0].get("main"),
-            "forecast_short_description": current_weather_data.get("weather", {})[0].get("description"),
+            "forecast_main_description": current_weather_data.get("weather", {})[0].get("main", None),
+            "forecast_short_description": current_weather_data.get("weather", {})[0].get("description", None),
             "sunrise": current_weather_data.get("sys", {}).get("sunrise", None),
             "sunset": current_weather_data.get("sys", {}).get("sunset", None),
             "timestamp_calc": current_weather_data.get("dt", None),
@@ -197,19 +198,20 @@ class WeatherFetcher:
             "apparent_temperature": round(query_data[4], 1),
             "temperature_min": round(query_data[5], 1),
             "temperature_max": round(query_data[6], 1),
-            "pressure": str(query_data[7]) + " hPa",
-            "humidity": str(query_data[8]) + "%",
-            "forecast_main_description": query_data[9],
-            "forecast_short_description": query_data[10],
-            "sunrise": time.strftime('%H:%M:%S', time.localtime(query_data[11])),
-            "sunset": time.strftime('%H:%M:%S', time.localtime(query_data[12])),
-            "timestamp_calc": query_data[13],
-            "wind_speed": query_data[14],
-            "wind_direction": query_data[15],
-            "wind_gust": query_data[16],
-            "rain": query_data[17],
-            "snow": query_data[18],
-            "visibility": query_data[19]
+            "clouds": query_data[7],
+            "pressure": str(query_data[8]) + " hPa",
+            "humidity": str(query_data[9]) + "%",
+            "forecast_main_description": query_data[10],
+            "forecast_short_description": query_data[11],
+            "sunrise": time.strftime('%H:%M:%S', time.localtime(query_data[12])),
+            "sunset": time.strftime('%H:%M:%S', time.localtime(query_data[13])),
+            "timestamp_calc": query_data[14],
+            "wind_speed": query_data[15],
+            "wind_direction": query_data[16],
+            "wind_gust": query_data[17],
+            "rain": query_data[18],
+            "snow": query_data[19],
+            "visibility": query_data[20]
         }
 
         return json.dumps(cur_weather_obj)
@@ -262,6 +264,7 @@ class WeatherFetcher:
         apparent_temperature = data["apparent_temperature"]
         temperature_min = data["temperature_min"]
         temperature_max = data["temperature_max"]
+        clouds = data["clouds"]
         pressure = data["pressure"]
         humidity = data["humidity"]
         forecast_main_description = data["forecast_main_description"]
@@ -277,9 +280,11 @@ class WeatherFetcher:
         visibility = data["visibility"]
         
         parsed_data = [
-            weather_code, temperature, apparent_temperature, temperature_min, temperature_max, pressure,
-            humidity, forecast_main_description, forecast_short_description, sunrise, sunset,
-            timestamp_calc, wind_speed, wind_direction, wind_gust, rain, snow, visibility,
+            weather_code, temperature, apparent_temperature,
+            temperature_min, temperature_max, clouds, pressure, humidity,
+            forecast_main_description, forecast_short_description, sunrise,
+            sunset, timestamp_calc, wind_speed, wind_direction, wind_gust,
+            rain, snow, visibility,
         ]
 
         with db_conn as conn:
@@ -294,6 +299,7 @@ class WeatherFetcher:
                         apparent_temperature,
                         temperature_min,
                         temperature_max,
+                        clouds,
                         pressure,
                         humidity,
                         forecast_main_description,
@@ -309,7 +315,7 @@ class WeatherFetcher:
                         visibility
                     )
                     VALUES (
-                        ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
+                        ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
                     )
                 """, (city_id, *parsed_data))
 
