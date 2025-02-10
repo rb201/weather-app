@@ -14,11 +14,6 @@ app.add_middleware(
     allow_methods = ["GET"]
 )
 
-@app.get("/")
-async def root():
-    return {"message": "hello world"}
-
-
 @app.get("/health")
 async def health_status():
     return {"message": "ya i'm ok"}
