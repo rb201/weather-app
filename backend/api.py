@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from data_fetcher import WeatherFetcher
+from backend.data_fetcher import WeatherFetcher
 
 origins = [
     "http://localhost:5173"
@@ -16,7 +16,7 @@ app.add_middleware(
 
 @app.get("/health")
 async def health_status():
-    return {"message": "ya i'm ok"}
+    return {"message": "ok"}
 
 
 @app.get("/current/")

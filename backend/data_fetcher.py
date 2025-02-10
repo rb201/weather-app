@@ -3,7 +3,6 @@ import json
 import os
 import requests
 import sqlite3
-import sys
 import time
 
 from contextlib import contextmanager
