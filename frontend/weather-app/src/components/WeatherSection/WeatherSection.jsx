@@ -36,7 +36,7 @@ export default function WeatherSection() {
 
     return (
       <div className="weather-container__current-primary-info">
-        <p className="weather-container__current-main-location">Jersey City, NJ, USA</p>
+        <p className="weather-container__current-main-location">Jersey City, NJ</p>
         <img
           src={sunIcon}
           className="weather-container__current-logo"
