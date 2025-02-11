@@ -1,14 +1,12 @@
+import Search from '../Search/Search.jsx'
+
 import './Nav.css'
 
 export default function Navigation(props) {
     return (
         <>
             <nav className="top-navigation">
-                <search>
-                    <form htmlFor="search" method="GET" className="form-search">
-                        <input name="search" type="text" placeholder="City" /> 
-                    </form>
-                </search>
+                <Search />
                 <button className="weather-container__current-title-bar-tenp-button">
                     C to F
                 </button>
