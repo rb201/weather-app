@@ -1,6 +1,8 @@
 DROP TABLE IF EXISTS cities;
 DROP TABLE IF EXISTS current_weather;
+DROP TABLE IF EXISTS global_list_of_cities;
 -- DROP TABLE IF EXISTS forecast;
+
 
 CREATE TABLE IF NOT EXISTS cities (
     id INTEGER PRIMARY KEY,
@@ -39,6 +41,14 @@ CREATE TABLE IF NOT EXISTS current_weather (
     FOREIGN KEY (city_id) REFERENCES cities(id)
 );
 
+CREATE TABLE IF NOT EXISTS global_list_of_cities (
+    id INTEGER PRIMARY KEY,
+    location_id INTEGER NOT NULL,
+    city_name TEXT NOT NULL,
+    country_code TEXT NOT NULL,
+    longitude REAL NOT NULL,
+    latitude REAL NOT NULL
+)
 -- CREATE TABLE IF NOT EXISTS forecast (
 --     id INTEGER PRIMARY KEY,
 --     city_id INTEGER NOT NULL,
