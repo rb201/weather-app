@@ -20,9 +20,7 @@ async def health_status():
 
 
 @app.get("/current/")
-async def get_current_weather():
-    city, state = "Jersey City", "New Jersey"
-    
+async def get_current_weather(city: str, state: str):
     wf = WeatherFetcher("weather.db", city = city, state = state)
     current_weather_data = wf.get_current_weather_from_db()
 
