@@ -1,24 +1,32 @@
-export default function Search({ searchInput, setSearchInput }) {
+export default function Search({ searchInput, setSearchInput, setWeatherData, setIsLoadingData }) {
     const searchInputHandler = (e) => {
         setSearchInput(e.target.value)
     }
 
-    const submitFormHandler = async (e) => {
+    const submitFormHandler = (e) => {
         e.preventDefault()
+        fetchWeatherData()
+    }
 
+    const fetchWeatherData = async () => {
         const [ city, state ] = searchInput.split(',').map( word => word.trim())
 
         let urlParams = new URLSearchParams({city, state})
 
         try {
-            const res = await fetch(`http://localhost:8000/search/?${urlParams}`)
+            const res = await fetch(`http://localhost:8000/current/?${urlParams}`);
+            const currentWeatherData = await res.json();
 
-            if (!res.ok) throw new Error('Submission failed');
+            if (!res.ok) {
+              throw new Error("Network response was not ok");
+            }
 
-        } catch (err) {
-            throw new Error(`Error has occurred: ${err}`)
+            setWeatherData(JSON.parse(currentWeatherData));
+            setIsLoadingData(false)
+        } catch (error) {
+            console.log(error)
         }
-    }
+    };
 
     return (
         <search>

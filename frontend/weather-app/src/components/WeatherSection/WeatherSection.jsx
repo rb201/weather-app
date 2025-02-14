@@ -1,31 +1,6 @@
-import { useEffect, useState } from "react";
-
 import sunIcon from "../../assets/weather-icons/sun.png";
 
-
-export default function WeatherSection() {
-  const [ weatherData, setWeaatherData ] = useState(null);
-  const [ isLoadingData, setIsLoadingData ] = useState(true);
-
-  useEffect(() => {
-    const fetchWeatherData = async () => {
-        try {
-            const res = await fetch("http://localhost:8000/current/");
-            const currentWeatherData = await res.json();
-
-            if (!res.ok) {
-              throw new Error("Network response was not ok");
-            }
-
-            setWeaatherData(JSON.parse(currentWeatherData));
-            setIsLoadingData(false)
-        } catch (error) {
-            console.log(error)
-        }
-    };
-
-    fetchWeatherData();
-  }, []);
+export default function WeatherSection({ isLoadingData, searchInput, weatherData}) {
 
   function parsePrimaryWeatherData() {
     if (isLoadingData) return <div>Loading...</div>
