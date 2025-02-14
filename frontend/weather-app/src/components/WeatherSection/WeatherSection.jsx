@@ -1,17 +1,17 @@
 import sunIcon from "../../assets/weather-icons/sun.png";
 
-export default function WeatherSection({ isLoadingData, searchInput, weatherData}) {
+export default function WeatherSection({ isLoadingData, weatherData }) {
 
   function parsePrimaryWeatherData() {
     if (isLoadingData) return <div>Loading...</div>
 
-    const temperature = weatherData["temperature"];
-    const apparent_temperature = weatherData["apparent_temperature"];
-    const description = weatherData["forecast_main_description"];
+    const temperature = weatherData.data.temperature;
+    const apparent_temperature = weatherData.data.apparent_temperature;
+    const description = weatherData.data.forecast_main_description;
 
     return (
       <div className="weather-container__current-primary-info">
-        <p className="weather-container__current-main-location">Jersey City, NJ</p>
+        <p className="weather-container__current-main-location">{weatherData.city}, {weatherData.state ? weatherData.state : weatherData.country}</p>
         <img
           src={sunIcon}
           className="weather-container__current-logo"
@@ -31,22 +31,25 @@ export default function WeatherSection({ isLoadingData, searchInput, weatherData
 
     const secondaryData = {};
 
-    secondaryData["Humidity"] = weatherData["humidity"];
-    secondaryData["Wind"] = weatherData["wind_speed"];
-    secondaryData["Pressure"] = weatherData["pressure"];
-    secondaryData["Visibility"] = weatherData["visibility"];
-    secondaryData["Sunset"] = weatherData["sunset"];
-    secondaryData["Rain"] = weatherData["rain"];
+    secondaryData["Humidity"] = weatherData.data.humidity;
+    secondaryData["Wind"] = weatherData.data.wind_speed;
+    secondaryData["Pressure"] = weatherData.data.pressure;
+    secondaryData["Visibility"] = weatherData.data.visibility;
+    secondaryData["Sunset"] = weatherData.data.sunset;
+    secondaryData["Rain"] = weatherData.data.rain;
+    secondaryData["Snow"] = weatherData.data.snow;
 
     return (
       <div className="weather-container__current-secondary-infos">
         {Object.keys(secondaryData).map((key, idx) => {
-          return (
-            <div key={idx} className="weather-container__current-secondary-info">
-              <p key={key + "_key"}className="weather-container__current-secondary-info-item">{key}</p>
-              <p key={key + "_val"} className="weather-container__current-secondary-info-item">{secondaryData[key]}</p>
-            </div>
-          );
+          if (secondaryData[key] !== null) {
+            return (
+              <div key={idx} className="weather-container__current-secondary-info">
+                <p key={key + "_key"}className="weather-container__current-secondary-info-item">{key}</p>
+                <p key={key + "_val"} className="weather-container__current-secondary-info-item">{secondaryData[key]}</p>
+              </div>
+            );
+          }
         })}
       </div>
     );
