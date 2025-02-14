@@ -68,7 +68,7 @@ class WeatherFetcher:
             print(f"found location id for {self.city}, {self.state}, {self.country}: {self.location_id}")
 
             if self.location_id is None:
-                raise Exception("Can't seem to find this place on a map")
+                raise Exception(f"Can't seem to find this place on a map. city: {self.city}, state: {self.state}")
 
 
     def add_city_to_db(
@@ -360,7 +360,9 @@ class WeatherFetcher:
 
                 cur.execute(query, [city, state, country])
 
-                return cur.fetchone()[0]
+                location_id = cur.fetchone()
+
+                return location_id[0] if location_id else None
             except sqlite3.Error as sqle:
                 print(sqle)
 
@@ -409,7 +411,13 @@ class WeatherFetcher:
                     state = state,
                     country = country
                 )
+
+                if location_id is None:
+                    print(f"city: {city}, country {country} doesnt exist")
+                    return city, state, "", None
+
                 return city, state, country, location_id
+
             elif country_code_data.get(state, None):
                 country = country_code_data.get(state)
                 state = ""
@@ -419,6 +427,10 @@ class WeatherFetcher:
                     state = state,
                     country = country
                 )
+
+                if location_id is None:
+                    print(f"city: {city}, country {country} doesnt exist")
+                    return city, state, "", None
 
                 return city, state, country, location_id
 
