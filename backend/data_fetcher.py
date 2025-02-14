@@ -46,17 +46,29 @@ class WeatherFetcher:
         latitude: float = None,
         longitude: float = None,
         city: str = None,
-        state: str = None
+        state: str = None,
+        country: str = None,
+        location_id: int = None,
     ):
         if longitude is None and latitude is None and city is None and state is None:
             print("Please include the coordinates of your location, or city and state")
             return
 
         self.db = DatabaseConnection(db_path)
+        self.city = city
+        self.state = state
+        self.country = country
         self.latitude = latitude
         self.longitude = longitude
-        self.city = city.lower() if city else city
-        self.state = state.lower() if state else state
+        self.location_id = location_id
+        self.current_weather_url = f"https://api.openweathermap.org/data/2.5/weather?id={self.location_id}&units=metric&appid=API_KEY"
+
+        if city and state:
+            self.city, self.state, self.country, self.location_id = self.validate_str_location(city = city, state = state)
+            print(f"found location id for {self.city}, {self.state}, {self.country}: {self.location_id}")
+
+            if self.location_id is None:
+                raise Exception("Can't seem to find this place on a map")
 
 
     def add_city_to_db(
@@ -72,20 +84,20 @@ class WeatherFetcher:
     ) -> int:
         db_conn = self.db.get_connection()
 
+        city_id = None
+
         with db_conn as conn:
             try:
                 cur = conn.cursor()
 
-                add_city_query = (
-                    """
+                add_city_query = """
                     INSERT INTO cities
                     (
                         name, state, country, timezone,
                         longitude, latitude, current_url, hourly_url
                     )
                     VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-                    """
-                )
+                """
 
                 cur.execute(
                     add_city_query,
@@ -99,24 +111,22 @@ class WeatherFetcher:
 
                 city_id = cur.lastrowid
             except sqlite3.Error as sqle:
-                print(f"Error adding city to database.cities: {sqle}")
+                print(f"Error adding city to database. {sqle}")
 
         return city_id
 
 
-    def get_current_weather(self):
-        url = f"https://api.openweathermap.org/data/2.5/weather?lat={self.latitude}&lon={self.longitude}&units=metric&appid={API_KEY}"
+    def fetch_latest_current_weather_from_source(self):
+        url = f"https://api.openweathermap.org/data/2.5/weather?id={self.location_id}&units=metric&appid={API_KEY}"
 
         try:
             res = requests.get(url)
             res.raise_for_status()
+            print('how aobut in here')
         except requests.HTTPError as http_error:
             print(f"HTTP error: {http_error}")
         except Exception as err:
             print(f"Error has occured: {err}")
-
-        # with open("owm_current.json", 'r') as f:
-        #     res = json.load(f)
 
         current_weather_data = json.loads(res.text)
 
@@ -141,36 +151,37 @@ class WeatherFetcher:
             "snow": current_weather_data.get("snow", None),
             "visibility": current_weather_data.get("visibility", None),
         }
-        timezone = parsed_current_weather_data.get("timezone")
 
-        if self.city is None and self.state is None:
-            self.get_city_from_lon_lat()
+        return parsed_current_weather_data
 
+
+    def get_current_weather(self):
         city_id = self.is_city_in_db()
 
-        if not city_id:
+        if city_id is None:
             city_id = self.add_city_to_db(
                 name = self.city,
                 state = self.state,
                 country = self.country,
-                timezone = timezone,
+                timezone = "",
                 latitude = self.latitude,
                 longitude = self.longitude,
-                current_url = url,
+                current_url = self.current_weather_url,
                 hourly_url = "",
             )
 
-        self.write_current_weather_to_db(
-            city_id = city_id,
-            data = parsed_current_weather_data
-        )
+            latest_weather_data = self.fetch_latest_current_weather_from_source()
+
+            self.write_current_weather_to_db(
+                city_id = city_id,
+                data = latest_weather_data
+            )
+
+        return self.get_current_weather_from_db()
 
 
     def get_current_weather_from_db(self):
-        info = [self.city, self.state]
-
-        if not self.city and self.state:
-            return {"message": "error, city and/or state not defined"}
+        loc_info = [self.city, self.state, self.country]
 
         db_conn = self.db.get_connection()
 
@@ -182,12 +193,12 @@ class WeatherFetcher:
                     SELECT cw.*
                     FROM current_weather cw
                     JOIN cities c on cw.city_id == c.id
-                    WHERE c.name = ? and c.state = ?
+                    WHERE c.name = ? and c.state = ? and c.country = ?
                     ORDER BY cw.city_id DESC
                     LIMIT 1
                 """
 
-                query_data = cur.execute(query, info).fetchone()
+                query_data = cur.execute(query, loc_info).fetchone()
 
             except sqlite3.Error as sqle:
                 print(f"Error has occurred {sqle}")
@@ -216,6 +227,7 @@ class WeatherFetcher:
 
         return json.dumps(cur_weather_obj)
 
+
     def get_city_from_lon_lat(self):
         geolocater = Nominatim(user_agent = 'my-weather-app')
 
@@ -230,11 +242,11 @@ class WeatherFetcher:
         # geolocater = Nominatim(user_agent = 'my-weather-app')
         pass
 
-
+    # Returns city_id if city exists in db, None if it doesnt
     def is_city_in_db(self) -> bool:
         db_conn = self.db.get_connection()
 
-        info = [self.city, self.state]
+        info = [self.city, self.state, self.country]
 
         with db_conn as conn:
             try:
@@ -244,7 +256,7 @@ class WeatherFetcher:
                     """
                     SELECT id, name, state
                     FROM cities
-                    WHERE name = ? and state = ?
+                    WHERE name = ? and state = ? and country = ?
                     """
                 )
 
@@ -254,7 +266,8 @@ class WeatherFetcher:
             except sqlite3.Error as sqle:
                 print(f"Error has occured: {sqle}")
 
-        return False if not city_in_db else city_in_db[0]
+        return None if city_in_db is None else city_in_db[0]
+
 
     def write_current_weather_to_db(self, city_id: int, data: dict):
         db_conn = self.db.get_connection()
@@ -291,7 +304,7 @@ class WeatherFetcher:
             try:
                 cur = conn.cursor()
 
-                cur.execute(f"""
+                cur.execute("""
                     INSERT INTO current_weather (
                         city_id,
                         weather_code,
@@ -317,12 +330,101 @@ class WeatherFetcher:
                     VALUES (
                         ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
                     )
-                """, (city_id, *parsed_data))
+                    """, (city_id, *parsed_data)
+                )
 
                 conn.commit()
             except sqlite3.Error as sqle:
                 print(sqle)
 
+
+    def load_json_data(self, file: str) -> dict:
+        try:
+            with open(CWD + file, "r") as f:
+                return json.load(f)
+        except FileNotFoundError as fnfe:
+            print(f"{fnfe}")
+
+
+    # state is set to "" in db where city is not in the US
+    def get_location_id_from_db(self, city, state, country):
+        with self.db.get_connection() as db_conn:
+            try:
+                cur = db_conn.cursor()
+
+                query = """
+                    SELECT location_id
+                    FROM global_list_of_cities
+                    WHERE city_name = ? and state = ? and country_code = ?
+                """
+
+                cur.execute(query, [city, state, country])
+
+                return cur.fetchone()[0]
+            except sqlite3.Error as sqle:
+                print(sqle)
+
+
+    def validate_str_location(self, city: str, state: str):
+        us_statecode_to_state_data = self.load_json_data("/data/us_statecode_to_state_map.json")
+        us_state_to_statecode_map = self.load_json_data("/data/us_state_to_statecode_map.json")
+        country_code_data = self.load_json_data("/data/country_code.json")
+
+        city = city.lower().title()
+
+        if len(state) == 2:
+            state = state.upper()
+
+            if state in us_statecode_to_state_data:
+                country = "US"
+
+                location_id = self.get_location_id_from_db(
+                    city = city,
+                    state = state,
+                    country = country
+                )
+
+                return city, state, country, location_id
+
+            country = state
+            state = ""
+
+            location_id = self.get_location_id_from_db(
+                city = city,
+                state = state,
+                country = country
+            )
+
+            return city, state, country, location_id
+
+        elif len(state) > 2:
+            state = state.lower().title()
+
+            if state in us_state_to_statecode_map:
+                state = us_state_to_statecode_map.get(state)
+                country = "US"
+
+                location_id = self.get_location_id_from_db(
+                    city = city,
+                    state = state,
+                    country = country
+                )
+                return city, state, country, location_id
+            elif country_code_data.get(state, None):
+                country = country_code_data.get(state)
+                state = ""
+
+                location_id = self.get_location_id_from_db(
+                    city = city,
+                    state = state,
+                    country = country
+                )
+
+                return city, state, country, location_id
+
+        # else catch and return not found
+        print(f'Havin trouble finding the state {state}')
+        return city, state, "", None
 
 # db_file = "weather.db"
 # lat, long = 40.719074, -74.050552
