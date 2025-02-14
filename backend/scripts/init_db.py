@@ -5,10 +5,10 @@ import sqlite3
 from contextlib import contextmanager
 
 CWD = os.path.dirname(os.path.abspath("backend"))
-DATABASE = os.path.join(CWD, "backend/weather.db")
-SCHEMA_FILE = os.path.join(CWD, "backend/schema.sql")
+DATABASE = os.path.join(CWD, "weather.db")
+SCHEMA_FILE = os.path.join(CWD, "schema.sql")
 
-GLOBAL_CITY_FILE = os.path.join(CWD, "backend/data/global_city.json")
+GLOBAL_CITY_FILE = os.path.join(CWD, "data/global_city.json")
 
 
 @contextmanager
@@ -41,24 +41,26 @@ def populate_global_city_into_db(file):
         for loc_obj in global_city_data:
             location_id = loc_obj["id"]
             city_name = loc_obj["name"]
+            state = loc_obj["state"]
             country_code = loc_obj["country"]
             longitude = loc_obj["coord"]["lon"]
             latitude = loc_obj["coord"]["lat"]
 
             location_info = [
-                location_id, city_name, country_code, longitude, latitude
+                location_id, city_name, state, country_code, longitude, latitude
             ]
 
             query = """
                 INSERT INTO global_list_of_cities (
                     location_id,
                     city_name,
+                    state,
                     country_code,
                     longitude,
                     latitude
                 )
                 VALUES (
-                    ?, ?, ?, ?, ?
+                    ?, ?, ?, ?, ?, ?
                 )
             """
 
@@ -87,6 +89,6 @@ def setup_tables():
             print(err)
 
 
-# setup_tables()
+setup_tables()
 
-populate_global_city_into_db(GLOBAL_CITY_FILE)
+# populate_global_city_into_db(GLOBAL_CITY_FILE)
