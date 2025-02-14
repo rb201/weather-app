@@ -8,10 +8,9 @@ CREATE TABLE IF NOT EXISTS cities (
     id INTEGER PRIMARY KEY,
     name TEXT NOT NULL,
     state TEXT NOT NULL,
-    country TEXT,
-    longitude REAL NOT NULL,
-    latitude REAL NOT NULL,
-    timezone TEXT,
+    country TEXT NOT NULL,
+    longitude REAL,
+    latitude REAL,
     current_url TEXT NOT NULL,
     hourly_url TEXT NOT NULL
 );
@@ -45,10 +44,12 @@ CREATE TABLE IF NOT EXISTS global_list_of_cities (
     id INTEGER PRIMARY KEY,
     location_id INTEGER NOT NULL,
     city_name TEXT NOT NULL,
+    state TEXT NOT NULL,
     country_code TEXT NOT NULL,
     longitude REAL NOT NULL,
     latitude REAL NOT NULL
-)
+);
+
 -- CREATE TABLE IF NOT EXISTS forecast (
 --     id INTEGER PRIMARY KEY,
 --     city_id INTEGER NOT NULL,
