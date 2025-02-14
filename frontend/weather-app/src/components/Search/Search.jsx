@@ -1,3 +1,5 @@
+import "./Search.css"
+
 export default function Search({ searchInput, setSearchInput, setWeatherData, setIsLoadingData }) {
     const searchInputHandler = (e) => {
         setSearchInput(e.target.value)
@@ -37,6 +39,7 @@ export default function Search({ searchInput, setSearchInput, setWeatherData, se
                 onSubmit={submitFormHandler}
             >
                 <input 
+                    className="search-location"
                     name="search"
                     type="text"
                     placeholder="City, Country"

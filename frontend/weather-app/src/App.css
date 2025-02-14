@@ -1,10 +1,15 @@
+body {
+  background-image: url('assets/backgrounds/cloudy-sky-with-sunbeams.jpg');
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
 #root {
-  /* max-width: 1280px; */
   width: 100%;
   margin: 0 auto;
   padding: 2rem;
   text-align: center;
-  background-color:rgb(36, 55, 77);
 }
 
 div {
@@ -64,8 +69,11 @@ div {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  margin: .5rem 3rem;
+  /* margin: .5rem 3rem; */
   align-items: center;
+  background-color:rgb(36, 55, 77, 0.689);
+  border-radius: 20px;
+
 }
 
 .weather-container__current-logo {
@@ -79,7 +87,7 @@ div {
 .weather-container__current-main-desc {
   /* color: rgb(25, 116, 116); */
   font-size: 1.5rem;
-  margin: 1.125rem;
+  margin: .75rem 0 .5rem 0;
 }
 
 .weather-container__current-main-temp, 
@@ -91,7 +99,7 @@ div {
 
 .weather-container__current-secondary-infos {
   display: flex;
-  height: 250px;
+  /* height: 250px; */
   flex-direction: column;
   justify-content: flex-start;
   /* align-items: flex-start; */
@@ -102,7 +110,8 @@ div {
   border-radius: 8px;
   background-color: rgba(48, 54, 54, 0.363);
   box-shadow: 1px 1px 5px 1px rgb(170, 168, 159); */
-
+  background-color:rgba(36, 55, 77, 0.689);
+  border-radius: 16px;
 }
 
 .weather-container__current-secondary-info {

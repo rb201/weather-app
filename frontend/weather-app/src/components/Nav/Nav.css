@@ -1,6 +1,7 @@
 .top-navigation {
     display: flex;
     justify-content: space-between;
+    align-items: center;
 }
 
 .weather-container__current-title-bar-tenp-button {
