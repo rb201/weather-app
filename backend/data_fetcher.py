@@ -225,7 +225,14 @@ class WeatherFetcher:
             "visibility": query_data[20]
         }
 
-        return json.dumps(cur_weather_obj)
+        data = {
+            "city": self.city,
+            "state": self.state,
+            "country": self.country,
+            "data": cur_weather_obj
+        }
+
+        return json.dumps(data)
 
 
     def get_city_from_lon_lat(self):
