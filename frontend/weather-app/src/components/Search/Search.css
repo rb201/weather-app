@@ -1,5 +1,5 @@
 .search-location {
-  border: 1px solid #cdcdcd;
-  border-color: rgba(0, 0, 0, .15);
+  border: 2px solid #cdcdcd;
   border-radius: 6px;
+  height: 1.25rem;
 }

@@ -1,7 +1,8 @@
-import sunIcon from "../../assets/weather-icons/sun.png";
+import sunIcon from "../../assets/weather-icons/color/615.png";
+
+import './WeatherSection.css'
 
 export default function WeatherSection({ isLoadingData, weatherData }) {
-
   function parsePrimaryWeatherData() {
     if (isLoadingData) return <div>Loading...</div>
 
@@ -58,7 +59,7 @@ export default function WeatherSection({ isLoadingData, weatherData }) {
   return (
     <>
         {parsePrimaryWeatherData()}
-        {parseSecWeatherData()}
+        {/* {parseSecWeatherData()} */}
     </>
   )
 }
