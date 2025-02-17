@@ -1,5 +1,6 @@
 ---
 kind: pipeline
+type: docker
 name: weather-app
 
 steps:
@@ -13,3 +14,9 @@ steps:
   image: python:3.11
   commands:
   - echo "hey"
+
+when:
+  branch:
+    development
+  event:
+    push
