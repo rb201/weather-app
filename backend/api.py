@@ -23,5 +23,6 @@ async def health_status():
 async def get_current_weather(city: str, state: str):
     wf = WeatherFetcher("weather.db", city = city, state = state)
     current_weather_data = wf.get_current_weather()
+    print(current_weather_data)
 
     return current_weather_data
