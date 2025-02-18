@@ -7,6 +7,7 @@ steps:
 - name: backend tests
   image: python:3.11
   commands:
+  - pip install -r backend/requirements.txt
   - pip install -r backend/tests/requirements.txt
   - pytest backend/tests
 
@@ -17,8 +18,8 @@ steps:
 
 trigger:
   branch:
-    - main
-    - master
-    - development
-  # event:
-  #   - push
+  - main
+  - master
+  - development
+  event:
+  - push
