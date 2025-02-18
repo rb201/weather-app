@@ -59,7 +59,7 @@ export default function WeatherSection({ isLoadingData, weatherData }) {
   return (
     <>
         {parsePrimaryWeatherData()}
-        {/* {parseSecWeatherData()} */}
+        {parseSecWeatherData()}
     </>
   )
 }
