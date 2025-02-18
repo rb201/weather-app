@@ -16,9 +16,9 @@ steps:
   commands:
     - echo "hey"
 
-trigger:
-  branch:
-    - master
-    - development
-  event:
-    - push
+# trigger:
+#   branch:
+#     - master
+#     - development
+#   event:
+#     - push
