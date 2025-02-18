@@ -17,8 +17,8 @@ steps:
 
 trigger:
   branch:
-    main
-    master
-    development
+    - main
+    - master
+    - development
   event:
-    push
+    - push
