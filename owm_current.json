@@ -1,0 +1,46 @@
+{
+    "coord": {
+        "lon": -74.0476,
+        "lat": 40.7182
+    },
+    "weather": [
+        {
+            "id": 802,
+            "main": "Clouds",
+            "description": "scattered clouds",
+            "icon": "03n"
+        }
+    ],
+    "base": "stations",
+    "main": {
+        "temp": -8.67,
+        "feels_like": -15.67,
+        "temp_min": -10.08,
+        "temp_max": -7.79,
+        "pressure": 1032,
+        "humidity": 48,
+        "sea_level": 1032,
+        "grnd_level": 1030
+    },
+    "visibility": 10000,
+    "wind": {
+        "speed": 7.2,
+        "deg": 300,
+        "gust": 10.8
+    },
+    "clouds": {
+        "all": 40
+    },
+    "dt": 1737516963,
+    "sys": {
+        "type": 2,
+        "id": 2008776,
+        "country": "US",
+        "sunrise": 1737461686,
+        "sunset": 1737496801
+    },
+    "timezone": -18000,
+    "id": 5099357,
+    "name": "Hudson",
+    "cod": 200
+}

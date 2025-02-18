@@ -1,0 +1,17 @@
+# Python
+.venv
+**/__pycache__
+**/.pytest_cache
+
+
+# Database
+*.sqlite
+*.db
+
+
+# Env files
+.env
+
+
+# React
+**/node_modules
