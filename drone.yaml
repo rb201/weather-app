@@ -18,7 +18,6 @@ steps:
 
 trigger:
   branch:
-  - main
   - master
   - development
   event:
