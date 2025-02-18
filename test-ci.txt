@@ -1,1 +1,1 @@
-test trigger2
+test trigger
