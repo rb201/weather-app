@@ -18,6 +18,7 @@ steps:
 when:
   branch:
     main
+    master
     development
   event:
     push
