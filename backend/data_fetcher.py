@@ -6,6 +6,8 @@ import sqlite3
 import time
 
 from contextlib import contextmanager
+from datetime import datetime
+
 from geopy.geocoders import Nominatim
 
 CWD = os.path.dirname(os.path.abspath(__file__))
@@ -122,7 +124,6 @@ class WeatherFetcher:
         try:
             res = requests.get(url)
             res.raise_for_status()
-            print('how aobut in here')
         except requests.HTTPError as http_error:
             print(f"HTTP error: {http_error}")
         except Exception as err:
@@ -155,9 +156,13 @@ class WeatherFetcher:
         return parsed_current_weather_data
 
 
+    # Refactor into separate functions
     def get_current_weather(self):
         city_id = self.is_city_in_db()
 
+        print(f"city_id : {city_id}")
+
+        # If city doesnt exist in DB
         if city_id is None:
             city_id = self.add_city_to_db(
                 name = self.city,
@@ -177,7 +182,27 @@ class WeatherFetcher:
                 data = latest_weather_data
             )
 
-        return self.get_current_weather_from_db()
+            # TODO - refactor
+            # i should just return this data here instead of reading
+            # it from db after writing the same data to the db
+
+        # return self.get_current_weather_from_db()
+        cur_weather_from_db = self.get_current_weather_from_db()
+        cur_weather_timestamp = cur_weather_from_db["data"]["timestamp_calc"]
+
+        cur_time = int(time.time())
+        if (cur_time - cur_weather_timestamp) > 21600:
+            print("data old, refreshing")
+            latest_weather_data = self.fetch_latest_current_weather_from_source()
+
+            self.write_current_weather_to_db(
+                city_id = city_id,
+                data = latest_weather_data
+            )
+
+            return json.dumps(self.get_current_weather_from_db())
+
+        return json.dumps(cur_weather_from_db)
 
 
     def get_current_weather_from_db(self):
@@ -194,7 +219,7 @@ class WeatherFetcher:
                     FROM current_weather cw
                     JOIN cities c on cw.city_id == c.id
                     WHERE c.name = ? and c.state = ? and c.country = ?
-                    ORDER BY cw.city_id DESC
+                    ORDER BY cw.timestamp_calc DESC
                     LIMIT 1
                 """
 
@@ -232,7 +257,8 @@ class WeatherFetcher:
             "data": cur_weather_obj
         }
 
-        return json.dumps(data)
+        # return json.dumps(data)
+        return data
 
 
     def get_city_from_lon_lat(self):
