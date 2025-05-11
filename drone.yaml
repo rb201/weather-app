@@ -4,7 +4,14 @@ type: docker
 name: weather-app
 
 steps:
-- name: backend tests
+- name: backend static checks
+  image: python:3.11
+  commands:
+    - pip install -r requirements-dev.txt
+    - ruff check --fix
+    - ruff format
+
+- name: backend unit-tests
   image: python:3.11
   commands:
     - pip install -r backend/requirements.txt
