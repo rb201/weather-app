@@ -24,7 +24,7 @@ def db_connection(database: str):
         if conn:
             try:
                 conn.close()
-            except sqlite3.Error as sqle:
+            except sqlite3.Error:
                 print("Error closing sql connection")
 
 
@@ -47,7 +47,12 @@ def populate_global_city_into_db(file):
             latitude = loc_obj["coord"]["lat"]
 
             location_info = [
-                location_id, city_name, state, country_code, longitude, latitude
+                location_id,
+                city_name,
+                state,
+                country_code,
+                longitude,
+                latitude,
             ]
 
             query = """
@@ -64,16 +69,14 @@ def populate_global_city_into_db(file):
                 )
             """
 
-            cur.execute(
-                query, [*location_info]
-            )
+            cur.execute(query, [*location_info])
 
             conn.commit()
 
 
 def setup_tables():
     try:
-        with open(SCHEMA_FILE, 'r') as sf:
+        with open(SCHEMA_FILE, "r") as sf:
             SQL_QUERY = sf.read()
 
     except FileNotFoundError as fnfe:
