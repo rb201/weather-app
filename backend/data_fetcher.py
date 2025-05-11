@@ -156,11 +156,16 @@ class WeatherFetcher:
         return parsed_current_weather_data
 
 
-    # Refactor into separate functions
     def get_current_weather(self):
-        city_id = self.is_city_in_db()
+        def get_latest_data_and_write_to_db(city_id: int):
+            latest_weather_data = self.fetch_latest_current_weather_from_source()
 
-        print(f"city_id : {city_id}")
+            self.write_current_weather_to_db(
+                city_id = city_id,
+                data = latest_weather_data
+            )
+
+        city_id = self.is_city_in_db()
 
         # If city doesnt exist in DB
         if city_id is None:
@@ -175,30 +180,16 @@ class WeatherFetcher:
                 hourly_url = "",
             )
 
-            latest_weather_data = self.fetch_latest_current_weather_from_source()
+            get_latest_data_and_write_to_db(city_id)
 
-            self.write_current_weather_to_db(
-                city_id = city_id,
-                data = latest_weather_data
-            )
-
-            # TODO - refactor
-            # i should just return this data here instead of reading
-            # it from db after writing the same data to the db
-
-        # return self.get_current_weather_from_db()
+        # Check if data is stale by looking at timestamp
         cur_weather_from_db = self.get_current_weather_from_db()
         cur_weather_timestamp = cur_weather_from_db["data"]["timestamp_calc"]
 
+        # If data is older than 6hrs, get latest from api
         cur_time = int(time.time())
         if (cur_time - cur_weather_timestamp) > 21600:
-            print("data old, refreshing")
-            latest_weather_data = self.fetch_latest_current_weather_from_source()
-
-            self.write_current_weather_to_db(
-                city_id = city_id,
-                data = latest_weather_data
-            )
+            get_latest_data_and_write_to_db(city_id)
 
             return json.dumps(self.get_current_weather_from_db())
 
