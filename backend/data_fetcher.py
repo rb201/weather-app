@@ -15,6 +15,7 @@ ENV_FILE_PATH = os.path.join(CWD, ".env")
 dotenv.load_dotenv()
 API_KEY = os.getenv("API_KEY")
 
+
 class WeatherFetcher:
     def __init__(
         self,
@@ -40,12 +41,17 @@ class WeatherFetcher:
         self.current_weather_url = f"https://api.openweathermap.org/data/2.5/weather?id={self.location_id}&units=metric&appid=API_KEY"
 
         if city and state:
-            self.city, self.state, self.country, self.location_id = self.validate_str_location(city = city, state = state)
-            print(f"found location id for {self.city}, {self.state}, {self.country}: {self.location_id}")
+            self.city, self.state, self.country, self.location_id = (
+                self.validate_str_location(city=city, state=state)
+            )
+            print(
+                f"found location id for {self.city}, {self.state}, {self.country}: {self.location_id}"
+            )
 
             if self.location_id is None:
-                raise Exception(f"Can't seem to find this place on a map. city: {self.city}, state: {self.state}")
-
+                raise Exception(
+                    f"Can't find location. city: {self.city}, state: {self.state}"
+                )
 
     def add_city_to_db(
         self,
@@ -78,9 +84,15 @@ class WeatherFetcher:
                 cur.execute(
                     add_city_query,
                     (
-                        name, state, country, timezone,
-                        longitude, latitude, current_url, hourly_url
-                    )
+                        name,
+                        state,
+                        country,
+                        timezone,
+                        longitude,
+                        latitude,
+                        current_url,
+                        hourly_url,
+                    ),
                 )
 
                 conn.commit()
@@ -90,7 +102,6 @@ class WeatherFetcher:
                 print(f"Error adding city to database. {sqle}")
 
         return city_id
-
 
     def fetch_latest_current_weather_from_source(self):
         url = f"https://api.openweathermap.org/data/2.5/weather?id={self.location_id}&units=metric&appid={API_KEY}"
@@ -108,14 +119,24 @@ class WeatherFetcher:
         parsed_current_weather_data = {
             "weather_code": current_weather_data.get("weather", {})[0].get("id"),
             "temperature": current_weather_data.get("main", {}).get("temp", None),
-            "apparent_temperature": current_weather_data.get("main", {}).get("feels_like", None),
-            "temperature_min": current_weather_data.get("main", {}).get("temp_min", None),
-            "temperature_max": current_weather_data.get("main", {}).get("temp_max", None),
+            "apparent_temperature": current_weather_data.get("main", {}).get(
+                "feels_like", None
+            ),
+            "temperature_min": current_weather_data.get("main", {}).get(
+                "temp_min", None
+            ),
+            "temperature_max": current_weather_data.get("main", {}).get(
+                "temp_max", None
+            ),
             "clouds": current_weather_data.get("clouds", {}).get("all", None),
             "pressure": current_weather_data.get("main", {}).get("pressure", None),
             "humidity": current_weather_data.get("main", {}).get("humidity", None),
-            "forecast_main_description": current_weather_data.get("weather", {})[0].get("main", None),
-            "forecast_short_description": current_weather_data.get("weather", {})[0].get("description", None),
+            "forecast_main_description": current_weather_data.get("weather", {})[0].get(
+                "main", None
+            ),
+            "forecast_short_description": current_weather_data.get("weather", {})[
+                0
+            ].get("description", None),
             "sunrise": current_weather_data.get("sys", {}).get("sunrise", None),
             "sunset": current_weather_data.get("sys", {}).get("sunset", None),
             "timestamp_calc": current_weather_data.get("dt", None),
@@ -129,29 +150,25 @@ class WeatherFetcher:
 
         return parsed_current_weather_data
 
-
     def get_current_weather(self):
         def get_latest_data_and_write_to_db(city_id: int):
             latest_weather_data = self.fetch_latest_current_weather_from_source()
 
-            self.write_current_weather_to_db(
-                city_id = city_id,
-                data = latest_weather_data
-            )
+            self.write_current_weather_to_db(city_id=city_id, data=latest_weather_data)
 
         city_id = self.is_city_in_db()
 
         # If city doesnt exist in DB
         if city_id is None:
             city_id = self.add_city_to_db(
-                name = self.city,
-                state = self.state,
-                country = self.country,
-                timezone = "",
-                latitude = self.latitude,
-                longitude = self.longitude,
-                current_url = self.current_weather_url,
-                hourly_url = "",
+                name=self.city,
+                state=self.state,
+                country=self.country,
+                timezone="",
+                latitude=self.latitude,
+                longitude=self.longitude,
+                current_url=self.current_weather_url,
+                hourly_url="",
             )
 
             get_latest_data_and_write_to_db(city_id)
@@ -168,7 +185,6 @@ class WeatherFetcher:
             return json.dumps(self.get_current_weather_from_db())
 
         return json.dumps(cur_weather_from_db)
-
 
     def get_current_weather_from_db(self):
         loc_info = [self.city, self.state, self.country]
@@ -204,38 +220,36 @@ class WeatherFetcher:
             "humidity": str(query_data[9]) + "%",
             "forecast_main_description": query_data[10],
             "forecast_short_description": query_data[11],
-            "sunrise": time.strftime('%H:%M:%S', time.localtime(query_data[12])),
-            "sunset": time.strftime('%H:%M:%S', time.localtime(query_data[13])),
+            "sunrise": time.strftime("%H:%M:%S", time.localtime(query_data[12])),
+            "sunset": time.strftime("%H:%M:%S", time.localtime(query_data[13])),
             "timestamp_calc": query_data[14],
             "wind_speed": query_data[15],
             "wind_direction": query_data[16],
             "wind_gust": query_data[17],
             "rain": query_data[18],
             "snow": query_data[19],
-            "visibility": query_data[20]
+            "visibility": query_data[20],
         }
 
         data = {
             "city": self.city,
             "state": self.state,
             "country": self.country,
-            "data": cur_weather_obj
+            "data": cur_weather_obj,
         }
 
         # return json.dumps(data)
         return data
 
-
     def get_city_from_lon_lat(self):
-        geolocater = Nominatim(user_agent = 'my-weather-app')
+        geolocater = Nominatim(user_agent="my-weather-app")
 
-        location = geolocater.reverse(str(self.latitude) + ',' + str(self.longitude))
+        location = geolocater.reverse(str(self.latitude) + "," + str(self.longitude))
 
-        self.city = location.raw['address']['city'].lower()
-        self.state = location.raw['address']['state'].lower()
-        self.country = location.raw['address']['country_code'].lower()
-    
-    
+        self.city = location.raw["address"]["city"].lower()
+        self.state = location.raw["address"]["state"].lower()
+        self.country = location.raw["address"]["country_code"].lower()
+
     def get_coor_from_city_state(self, city: str, state: str):
         # geolocater = Nominatim(user_agent = 'my-weather-app')
         pass
@@ -249,14 +263,12 @@ class WeatherFetcher:
         with db_conn as conn:
             try:
                 cur = conn.cursor()
-                
-                query = (
-                    """
+
+                query = """
                     SELECT id, name, state
                     FROM cities
                     WHERE name = ? and state = ? and country = ?
                     """
-                )
 
                 cur.execute(query, info)
 
@@ -266,10 +278,9 @@ class WeatherFetcher:
 
         return None if city_in_db is None else city_in_db[0]
 
-
     def write_current_weather_to_db(self, city_id: int, data: dict):
         db_conn = self.db.get_connection()
-        
+
         weather_code = data["weather_code"]
         temperature = data["temperature"]
         apparent_temperature = data["apparent_temperature"]
@@ -289,20 +300,35 @@ class WeatherFetcher:
         rain = data["rain"]
         snow = data["snow"]
         visibility = data["visibility"]
-        
+
         parsed_data = [
-            weather_code, temperature, apparent_temperature,
-            temperature_min, temperature_max, clouds, pressure, humidity,
-            forecast_main_description, forecast_short_description, sunrise,
-            sunset, timestamp_calc, wind_speed, wind_direction, wind_gust,
-            rain, snow, visibility,
+            weather_code,
+            temperature,
+            apparent_temperature,
+            temperature_min,
+            temperature_max,
+            clouds,
+            pressure,
+            humidity,
+            forecast_main_description,
+            forecast_short_description,
+            sunrise,
+            sunset,
+            timestamp_calc,
+            wind_speed,
+            wind_direction,
+            wind_gust,
+            rain,
+            snow,
+            visibility,
         ]
 
         with db_conn as conn:
             try:
                 cur = conn.cursor()
 
-                cur.execute("""
+                cur.execute(
+                    """
                     INSERT INTO current_weather (
                         city_id,
                         weather_code,
@@ -328,13 +354,13 @@ class WeatherFetcher:
                     VALUES (
                         ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
                     )
-                    """, (city_id, *parsed_data)
+                    """,
+                    (city_id, *parsed_data),
                 )
 
                 conn.commit()
             except sqlite3.Error as sqle:
                 print(sqle)
-
 
     def load_json_data(self, file: str) -> dict:
         try:
@@ -342,7 +368,6 @@ class WeatherFetcher:
                 return json.load(f)
         except FileNotFoundError as fnfe:
             print(f"{fnfe}")
-
 
     # state is set to "" in db where city is not in the US
     def get_location_id_from_db(self, city, state, country):
@@ -364,10 +389,13 @@ class WeatherFetcher:
             except sqlite3.Error as sqle:
                 print(sqle)
 
-
     def validate_str_location(self, city: str, state: str):
-        us_statecode_to_state_data = self.load_json_data("/data/us_statecode_to_state_map.json")
-        us_state_to_statecode_map = self.load_json_data("/data/us_state_to_statecode_map.json")
+        us_statecode_to_state_data = self.load_json_data(
+            "/data/us_statecode_to_state_map.json"
+        )
+        us_state_to_statecode_map = self.load_json_data(
+            "/data/us_state_to_statecode_map.json"
+        )
         country_code_data = self.load_json_data("/data/country_code.json")
 
         city = city.lower().title()
@@ -379,9 +407,7 @@ class WeatherFetcher:
                 country = "US"
 
                 location_id = self.get_location_id_from_db(
-                    city = city,
-                    state = state,
-                    country = country
+                    city=city, state=state, country=country
                 )
 
                 return city, state, country, location_id
@@ -390,9 +416,7 @@ class WeatherFetcher:
             state = ""
 
             location_id = self.get_location_id_from_db(
-                city = city,
-                state = state,
-                country = country
+                city=city, state=state, country=country
             )
 
             return city, state, country, location_id
@@ -405,9 +429,7 @@ class WeatherFetcher:
                 country = "US"
 
                 location_id = self.get_location_id_from_db(
-                    city = city,
-                    state = state,
-                    country = country
+                    city=city, state=state, country=country
                 )
 
                 if location_id is None:
@@ -421,9 +443,7 @@ class WeatherFetcher:
                 state = ""
 
                 location_id = self.get_location_id_from_db(
-                    city = city,
-                    state = state,
-                    country = country
+                    city=city, state=state, country=country
                 )
 
                 if location_id is None:
@@ -432,9 +452,10 @@ class WeatherFetcher:
 
                 return city, state, country, location_id
 
-        # else catch and return not found
-        print(f'Havin trouble finding the state {state}')
+        # else not found
+        print(f"Havin trouble finding the state: {state}")
         return city, state, "", None
+
 
 # db_file = "weather.db"
 # lat, long = 40.719074, -74.050552
