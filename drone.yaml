@@ -7,7 +7,7 @@ steps:
 - name: backend static checks
   image: python:3.11
   commands:
-    - pip install -r requirements-dev.txt
+    - pip install -r backend/requirements-dev.txt
     - ruff check backend/*.py --fix
     - ruff format backend/*.py
 
