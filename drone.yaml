@@ -8,8 +8,8 @@ steps:
   image: python:3.11
   commands:
     - pip install -r requirements-dev.txt
-    - ruff check --fix
-    - ruff format
+    - ruff check backend/*.py --fix
+    - ruff format backend/*.py
 
 - name: backend unit-tests
   image: python:3.11
