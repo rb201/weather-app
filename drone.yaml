@@ -11,7 +11,7 @@ steps:
     - pip install -r backend/requirements.txt
     - ruff check backend/*.py --fix
     - ruff format backend/*.py
-    - mypy backend/
+    - mypy --config-file pyproject.toml backend/
 
 - name: backend unit-tests
   image: python:3.11
