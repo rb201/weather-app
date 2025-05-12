@@ -10,6 +10,7 @@ steps:
     - pip install -r backend/requirements-dev.txt
     - ruff check backend/*.py --fix
     - ruff format backend/*.py
+    - mypy backend/
 
 - name: backend unit-tests
   image: python:3.11
