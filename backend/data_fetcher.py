@@ -5,7 +5,7 @@ import requests
 import sqlite3
 import time
 
-from geopy.geocoders import Nominatim
+from typing import Optional, Tuple, Union
 
 from .database_connection import DatabaseConnection
 
@@ -20,15 +20,19 @@ class WeatherFetcher:
     def __init__(
         self,
         db_path: str,
-        latitude: float = None,
-        longitude: float = None,
-        city: str = None,
-        state: str = None,
-        country: str = None,
-        location_id: int = None,
+        city: str,
+        state: str,
+        country: str = "",
+        latitude: Optional[float] = None,  # not supported yet
+        longitude: Optional[float] = None,  # not supported yet
+        location_id: Optional[int] = None,
     ):
-        if longitude is None and latitude is None and city is None and state is None:
-            print("Please include the coordinates of your location, or city and state")
+        # if longitude is None and latitude is None and city is None and state is None:
+        if city is None and state is None:
+            # print("Please include the coordinates of your location, or city and state")
+            print(
+                "Validate your location, 'city, state' for USA. 'city, country' otherwise"
+            )
             return
 
         self.db = DatabaseConnection(db_path)
@@ -55,18 +59,16 @@ class WeatherFetcher:
 
     def add_city_to_db(
         self,
-        name: str,
+        city: str,
         state: str,
         country: str,
         timezone: str,
-        latitude: float,
-        longitude: float,
+        latitude: Union[float, None],
+        longitude: Union[float, None],
         current_url: str,
         hourly_url: str,
     ) -> int:
         db_conn = self.db.get_connection()
-
-        city_id = None
 
         with db_conn as conn:
             try:
@@ -84,7 +86,7 @@ class WeatherFetcher:
                 cur.execute(
                     add_city_query,
                     (
-                        name,
+                        city,
                         state,
                         country,
                         timezone,
@@ -103,7 +105,7 @@ class WeatherFetcher:
 
         return city_id
 
-    def fetch_latest_current_weather_from_source(self):
+    def fetch_latest_current_weather_from_source(self) -> dict:
         url = f"https://api.openweathermap.org/data/2.5/weather?id={self.location_id}&units=metric&appid={API_KEY}"
 
         try:
@@ -150,7 +152,7 @@ class WeatherFetcher:
 
         return parsed_current_weather_data
 
-    def get_current_weather(self):
+    def get_current_weather(self) -> str:
         def get_latest_data_and_write_to_db(city_id: int):
             latest_weather_data = self.fetch_latest_current_weather_from_source()
 
@@ -161,7 +163,7 @@ class WeatherFetcher:
         # If city doesnt exist in DB
         if city_id is None:
             city_id = self.add_city_to_db(
-                name=self.city,
+                city=self.city,
                 state=self.state,
                 country=self.country,
                 timezone="",
@@ -186,7 +188,7 @@ class WeatherFetcher:
 
         return json.dumps(cur_weather_from_db)
 
-    def get_current_weather_from_db(self):
+    def get_current_weather_from_db(self) -> dict:
         loc_info = [self.city, self.state, self.country]
 
         db_conn = self.db.get_connection()
@@ -241,21 +243,8 @@ class WeatherFetcher:
         # return json.dumps(data)
         return data
 
-    def get_city_from_lon_lat(self):
-        geolocater = Nominatim(user_agent="my-weather-app")
-
-        location = geolocater.reverse(str(self.latitude) + "," + str(self.longitude))
-
-        self.city = location.raw["address"]["city"].lower()
-        self.state = location.raw["address"]["state"].lower()
-        self.country = location.raw["address"]["country_code"].lower()
-
-    def get_coor_from_city_state(self, city: str, state: str):
-        # geolocater = Nominatim(user_agent = 'my-weather-app')
-        pass
-
     # Returns city_id if city exists in db, None if it doesnt
-    def is_city_in_db(self) -> bool:
+    def is_city_in_db(self) -> Union[int, None]:
         db_conn = self.db.get_connection()
 
         info = [self.city, self.state, self.country]
@@ -278,7 +267,7 @@ class WeatherFetcher:
 
         return None if city_in_db is None else city_in_db[0]
 
-    def write_current_weather_to_db(self, city_id: int, data: dict):
+    def write_current_weather_to_db(self, city_id: int, data: dict) -> None:
         db_conn = self.db.get_connection()
 
         weather_code = data["weather_code"]
@@ -369,8 +358,10 @@ class WeatherFetcher:
         except FileNotFoundError as fnfe:
             print(f"{fnfe}")
 
+        return {}
+
     # state is set to "" in db where city is not in the US
-    def get_location_id_from_db(self, city, state, country):
+    def get_location_id_from_db(self, city, state, country) -> Union[int, None]:
         with self.db.get_connection() as db_conn:
             try:
                 cur = db_conn.cursor()
@@ -385,11 +376,17 @@ class WeatherFetcher:
 
                 location_id = cur.fetchone()
 
-                return location_id[0] if location_id else None
+                if location_id:
+                    return location_id[0]
+
             except sqlite3.Error as sqle:
                 print(sqle)
 
-    def validate_str_location(self, city: str, state: str):
+            return None
+
+    def validate_str_location(
+        self, city: str, state: str
+    ) -> Tuple[str, str, str, Union[int, None]]:
         us_statecode_to_state_data = self.load_json_data(
             "/data/us_statecode_to_state_map.json"
         )
@@ -425,7 +422,7 @@ class WeatherFetcher:
             state = state.lower().title()
 
             if state in us_state_to_statecode_map:
-                state = us_state_to_statecode_map.get(state)
+                state = us_state_to_statecode_map[state]
                 country = "US"
 
                 location_id = self.get_location_id_from_db(
@@ -439,7 +436,7 @@ class WeatherFetcher:
                 return city, state, country, location_id
 
             elif country_code_data.get(state, None):
-                country = country_code_data.get(state)
+                country = country_code_data[state]
                 state = ""
 
                 location_id = self.get_location_id_from_db(
