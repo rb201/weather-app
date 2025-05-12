@@ -1,0 +1,16 @@
+# Static checks
+
+[tool.mypy]
+
+[[tool.mypy.overrides]]
+module = 'geopy.geocoders'
+ignore_missing_imports = true
+
+
+# Testing
+
+[tool.pytest]
+markers = [
+    "api: marks api-related tests",
+    "database: marks database-related tests",
+]
