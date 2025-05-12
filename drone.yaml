@@ -8,6 +8,7 @@ steps:
   image: python:3.11
   commands:
     - pip install -r backend/requirements-dev.txt
+    - pip install -r backend/requirements.txt
     - ruff check backend/*.py --fix
     - ruff format backend/*.py
     - mypy backend/
