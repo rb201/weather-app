@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from backend.data_fetcher import WeatherFetcher
+from .data_fetcher import WeatherFetcher
 
 origins = ["http://localhost:5173"]
 
