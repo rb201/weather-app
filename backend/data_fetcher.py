@@ -240,7 +240,6 @@ class WeatherFetcher:
             "data": cur_weather_obj,
         }
 
-        # return json.dumps(data)
         return data
 
     # Returns city_id if city exists in db, None if it doesnt
@@ -449,8 +448,7 @@ class WeatherFetcher:
 
                 return city, state, country, location_id
 
-        # else not found
-        print(f"Havin trouble finding the state: {state}")
+        print(f"Having trouble finding the state: {state}")
         return city, state, "", None
 
 
