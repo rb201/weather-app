@@ -1,11 +1,11 @@
 # Static checks
 
 [tool.mypy]
+mypy_path = "../venv/bin/"
 
 [[tool.mypy.overrides]]
 module = 'geopy.geocoders'
 ignore_missing_imports = true
-
 
 # Testing
 
