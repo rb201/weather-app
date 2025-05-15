@@ -59,6 +59,8 @@ markupsafe==3.0.2
     # via jinja2
 mdurl==0.1.2
     # via markdown-it-py
+prometheus-client==0.21.1
+    # via -r requirements.in
 pydantic==2.11.4
     # via fastapi
 pydantic-core==2.33.2
