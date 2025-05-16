@@ -457,3 +457,5 @@ class WeatherFetcher:
 
 # weather_obj = WeatherFetcher(db_file, longitude = long, latitude = lat)
 # weather_obj.get_current_weather()
+
+test = ""
