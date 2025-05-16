@@ -31,3 +31,4 @@ trigger:
     - development
   event:
     - push
+    - custom
