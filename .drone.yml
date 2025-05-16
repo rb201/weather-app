@@ -29,5 +29,5 @@ steps:
 #   branch:
 #     - master
 #     - development
-#   event:
+#   event:d
 #     - push
