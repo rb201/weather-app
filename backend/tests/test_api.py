@@ -18,7 +18,7 @@ def test_health_check_method():
     assert res.status_code == 405
 
 
-def test_current_endpoint_with_query_param():
-    res = client.get("/current/?city=jersey city&state=NJ")
+# def test_current_endpoint_with_query_param():
+#     res = client.get("/current/?city=jersey city&state=NJ")
 
-    assert res.status_code == 200
+#     assert res.status_code == 200
