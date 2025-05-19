@@ -56,4 +56,3 @@ async def health_status(dep: str = Depends(http_requests_metrics)):
 @app.get("/metrics")
 def metrics():
     return generate_latest(metrics_registry).decode("utf8").split("\n")
-f
