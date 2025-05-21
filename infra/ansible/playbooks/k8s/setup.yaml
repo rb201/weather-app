@@ -1,0 +1,50 @@
+- name: Prep system for k3s cluster
+  hosts: k3s
+  tasks:
+    # - name: Set hostname
+    #   ansible.builtin.hostname:
+    #     name: "{{ inventory_hostname }}"
+    #     use: systemd
+    #   become: true
+
+    # - name: Update pkgs
+    #   ansible.builtin.dnf:
+    #     name: "*"
+    #     state: latest
+    #   become: true
+      
+
+    - name: Install zsh
+      ansible.builtin.dnf:
+        name: 
+        - zsh
+        - git
+        - curl
+        state: latest
+      become: true
+    
+    - name: Fetch oh-my-zsh script
+      ansible.builtin.get_url:
+        url: https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh
+        dest: /tmp
+        mode: u=rwx,o=rx
+      become: true
+
+    - name: Check if oh-my-zsh exists already
+      ansible.builtin.stat:
+        path: /root/.oh-my-zsh
+      become: true
+      register: ohmyzsh_exists
+
+    - name: Install oh-my-zsh
+      ansible.builtin.expect:
+        command: /tmp/install.sh
+        responses:
+          "Do you want to change your default shell to zsh": "Y"
+        timeout: 60
+      when: not ohmyzsh_exists.stat.isdir
+      become: true
+
+    - name: Install k3s agent
+      ansible.builtin.shell:
+        cmd: curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC="agent --server https://jump.jrzylab.xyz:6443 --token token" sh -

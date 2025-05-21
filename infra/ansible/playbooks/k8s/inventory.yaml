@@ -1,0 +1,10 @@
+k3s:
+  hosts:
+    k8s01.jrzylab.xyz:
+      ansible_host: 192.168.1.233
+  
+    k8s02.jrzylab.xyz:
+      ansible_host: 192.168.1.235
+
+    k8s03.jrzylab.xyz:
+      ansible_host: 192.168.1.236
