@@ -25,6 +25,21 @@ steps:
   commands:
     - echo "hey"
 
+# - name: Build backend image
+#   image: plugins/docker
+#   settings:
+#     regsitry: gitea.jrzylab.xyz
+#     username:
+#       from_secret: registry_username
+#     password:
+#       from_secret: registry_password
+#     repo: ramon/weather-app
+#     context: backend/
+#     # cache_from:
+#     tags:
+#     - '0.1.0'
+#     - latest
+
 trigger:
   branch:
     - master
