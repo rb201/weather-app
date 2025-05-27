@@ -26,7 +26,15 @@ spec:
           limits:
             memory: 512Mi
             cpu: 500m
-
+        volumeMounts:
+          - name: sqlitedb
+            mountPath: /data
+      volumes:
+        - name: sqlitedb
+          nfs:
+            server: nfs.jrzylab.xyz
+            path: /data/app_data/weather-app
+            readOnly: false
 
 ---
 apiVersion: v1
