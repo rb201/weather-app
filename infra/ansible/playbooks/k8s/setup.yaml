@@ -20,7 +20,7 @@
         - curl
         - nfsv4-client-utils
         state: latest
-    
+
     - name: Create dir for mount
       ansible.builtin.file:
         path: /mnt/apps/weather-app
