@@ -111,7 +111,7 @@ class WeatherFetcher:
         try:
             res = requests.get(url)
             res.raise_for_status()
-        except requests.HTTPError as http_error:
+        except requests.exceptions.HTTPError as http_error:
             print(f"HTTP error: {http_error}")
         except Exception as err:
             print(f"Error has occured: {err}")
