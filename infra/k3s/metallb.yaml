@@ -1,0 +1,23 @@
+---
+apiVersion: metallb.io/v1beta1
+kind: IPAddressPool
+metadata:
+  name: lb-ip-pool
+  namespace: metallb-system
+spec:
+  addresses:
+  - 192.168.1.208-192.168.1.210
+
+
+---
+apiVersion: metallb.io/v1beta1
+kind: L2Advertisement
+metadata:
+  name: metallb-advertistment
+  namespace: metallb-system
+spec:
+  ipAddressPools:
+    - lb-ip-pool
+  nodeSelectors:
+  - matchLabels:
+      kubernetes.io/worker: "true"
