@@ -80,7 +80,9 @@ steps:
 
 volumes:
 - name: dockersock
-  temp: {}
+  # temp: {}
+  host:
+    path: /var/run/docker.sock
 
 trigger:
   branch:
