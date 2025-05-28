@@ -67,7 +67,6 @@ steps:
       from_secret: GITEA_PASSWORD
   commands:
     - pwd
-    - ls -lha .docker
     - ls -lha /var/run
     - ls -lha /var/run/docker.sock
     - echo "$PASSWORD" | docker login --username "$USERNAME" gitea.jrzylab.xyz --password-stdin
