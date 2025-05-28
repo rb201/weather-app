@@ -28,7 +28,7 @@ steps:
   depends_on:
     - backend-static-checks
 
-- name: frontend-tests
+- name: frontend-unit-tests
   image: python:3.11
   commands:
     - echo "100% sure this code works 100% of the time, every time. No test needed"
