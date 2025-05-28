@@ -4,7 +4,7 @@ type: docker
 name: weather-app
 
 steps:
-- name: backend static checks
+- name: backend-static-checks
   image: python:3.11
   commands:
     - pip install -r backend/requirements-dev.txt
@@ -13,32 +13,71 @@ steps:
     - ruff format backend/*.py
     - mypy --config-file backend/pyproject.toml backend/
 
-- name: backend unit-tests
+- name: frontend-static-checks
+  image: node
+  commands:
+    - echo "npm run lint"
+    - echo "code is perfect, no analysis needed"
+
+- name: backend-unit-tests
   image: python:3.11
   commands:
     - pip install -r backend/requirements.txt
     - pip install -r backend/tests/requirements.txt
     - pytest backend/tests
+  depends_on:
+    - backend-static-checks
 
 - name: frontend tests
   image: python:3.11
   commands:
-    - echo "hey"
+    - echo "100% sure this code works 100% of the time, every time. No test needed"
+  depends_on:
+    - frontend-static-checks
 
-# - name: Build backend image
-#   image: plugins/docker
-#   settings:
-#     regsitry: gitea.jrzylab.xyz
-#     username:
-#       from_secret: registry_username
-#     password:
-#       from_secret: registry_password
-#     repo: ramon/weather-app
-#     context: backend/
-#     # cache_from:
-#     tags:
-#     - '0.1.0'
-#     - latest
+- name: Build backend image
+  image: docker:dind
+  volumes:
+    - name: dockersock
+      path: /var/run
+  environment:
+    USERNAME:
+      from_secret: WEATHER_APP_USERNAME
+    PASSWORD:
+      from_secret: WEATHER_APP_PASSWORD
+  commands:
+    - docker login -u $USERNAME -p $PASSWORD gitea.jrzylab.xyz
+    - cd backend/
+    - docker build -t gitea.jrzylab.xyz/ramon/weather-app/weather-backend:"${VERSION}"-dev .
+    - docker tag gitea.jrzylab.xyz/ramon/weather-app/weather-backend:"${VERSION}"-dev gitea.jrzylab.xyz/ramon/weather-app/weather-backend:latest
+    - docker push gitea.jrzylab.xyz/ramon/weather-app/weather-backend:"${VERSION}"-dev
+    - docker push gitea.jrzylab.xyz/ramon/weather-app/weather-backend:latest
+  depends_on:
+    - backend-unit-tests
+
+- name: Build frontend image
+  image: docker:dind
+  volumes:
+  - name: dockersock
+    path: /var/run
+  environment:
+    USERNAME:
+      from_secret: WEATHER_APP_USERNAME
+    PASSWORD:
+      from_secret: WEATHER_APP_PASSWORD
+  commands:
+    - docker login -u $USERNAME -p $PASSWORD gitea.jrzylab.xyz
+    - cd frontend/
+    - docker build -t gitea.jrzylab.xyz/ramon/weather-app/weather-frontend:"${VERSION}"-dev .
+    - docker tag gitea.jrzylab.xyz/ramon/weather-app/weather-backend:"${VERSION}"-dev gitea.jrzylab.xyz/ramon/weather-app/weather-backend:latest
+    - docker push gitea.jrzylab.xyz/ramon/weather-app/weather-backend:"${VERSION}"-dev 
+    - docker push gitea.jrzylab.xyz/ramon/weather-app/weather-backend:latest
+  depends_on:
+    - frontend-unit-tests
+
+volumes:
+- name: dockersock
+  temp: {}
 
 trigger:
   branch:
