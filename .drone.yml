@@ -48,9 +48,9 @@ steps:
   commands:
     - echo "$PASSWORD" | docker login --username "$USERNAME" gitea.jrzylab.xyz --password-stdin
     - cd backend/
-    - docker build -t gitea.jrzylab.xyz/ramon/weather-app/weather-backend:"${VERSION}"-dev .
-    - docker tag gitea.jrzylab.xyz/ramon/weather-app/weather-backend:"${VERSION}"-dev gitea.jrzylab.xyz/ramon/weather-app/weather-backend:latest
-    - docker push gitea.jrzylab.xyz/ramon/weather-app/weather-backend:"${VERSION}"-dev
+    - docker build -t gitea.jrzylab.xyz/ramon/weather-app/weather-backend:0.1.0-dev .
+    - docker tag gitea.jrzylab.xyz/ramon/weather-app/weather-backend:0.1.0-dev gitea.jrzylab.xyz/ramon/weather-app/weather-backend:latest
+    - docker push gitea.jrzylab.xyz/ramon/weather-app/weather-backend:0.1.0-dev
     - docker push gitea.jrzylab.xyz/ramon/weather-app/weather-backend:latest
   depends_on:
     - backend-unit-tests
@@ -71,9 +71,9 @@ steps:
     - ls -lha /var/run/docker.sock
     - echo "$PASSWORD" | docker login --username "$USERNAME" gitea.jrzylab.xyz --password-stdin
     - cd frontend/
-    - docker build -t gitea.jrzylab.xyz/ramon/weather-app/weather-frontend:"${VERSION}"-dev .
-    - docker tag gitea.jrzylab.xyz/ramon/weather-app/weather-backend:"${VERSION}"-dev gitea.jrzylab.xyz/ramon/weather-app/weather-backend:latest
-    - docker push gitea.jrzylab.xyz/ramon/weather-app/weather-backend:"${VERSION}"-dev 
+    - docker build -t gitea.jrzylab.xyz/ramon/weather-app/weather-frontend:0.1.0-dev .
+    - docker tag gitea.jrzylab.xyz/ramon/weather-app/weather-backend:0.1.0-dev gitea.jrzylab.xyz/ramon/weather-app/weather-backend:latest
+    - docker push gitea.jrzylab.xyz/ramon/weather-app/weather-backend:0.1.0-dev
     - docker push gitea.jrzylab.xyz/ramon/weather-app/weather-backend:latest
   depends_on:
     - frontend-unit-tests
