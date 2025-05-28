@@ -69,7 +69,7 @@ steps:
     - env
     - echo "username - ${USERNAME}"
     - echo "password - ${PASSWORD}"
-    - docker login -u "${USERNAME}" -p "${PASSWORD}" gitea.jrzylab.xyz
+    - echo "${PASSWORD}" | docker login -u "${USERNAME}" --password-stdin gitea.jrzylab.xyz
     - cd frontend/
     - docker build -t gitea.jrzylab.xyz/ramon/weather-app/weather-frontend:"${VERSION}"-dev .
     - docker tag gitea.jrzylab.xyz/ramon/weather-app/weather-backend:"${VERSION}"-dev gitea.jrzylab.xyz/ramon/weather-app/weather-backend:latest
