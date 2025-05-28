@@ -41,14 +41,12 @@ steps:
     - name: dockersock
       path: /var/run
   environment:
-    USERNAME:
-      from_secret: WEATHER_APP_USERNAME
-    PASSWORD:
-      from_secret: WEATHER_APP_PASSWORD
+    GITEA_USERNAME:
+      from_secret: GITEA_USERNAME
+    GITEA_PASSWORD:
+      from_secret: GITEA_PASSWORD
   commands:
-    - echo "username - ${USERNAME}"
-    - echo "password - ${PASSWORD}"
-    - docker login -u $USERNAME -p $PASSWORD gitea.jrzylab.xyz
+    - docker login -u "${GITEA_USERNAME}" -p "${GITEA_PASSWORD}" gitea.jrzylab.xyz
     - cd backend/
     - docker build -t gitea.jrzylab.xyz/ramon/weather-app/weather-backend:"${VERSION}"-dev .
     - docker tag gitea.jrzylab.xyz/ramon/weather-app/weather-backend:"${VERSION}"-dev gitea.jrzylab.xyz/ramon/weather-app/weather-backend:latest
@@ -63,15 +61,15 @@ steps:
   - name: dockersock
     path: /var/run
   environment:
-    USERNAME:
-      from_secret: WEATHER_APP_USERNAME
-    PASSWORD:
-      from_secret: WEATHER_APP_PASSWORD
+    GITEA_USERNAME:
+      from_secret: GITEA_USERNAME
+    GITEA_PASSWORD:
+      from_secret: GITEA_PASSWORD
   commands:
     - env
-    - echo "username - ${USERNAME}"
-    - echo "password - ${PASSWORD}"
-    - docker login -u $USERNAME -p $PASSWORD gitea.jrzylab.xyz
+    - echo "username - ${GITEA_USERNAME}"
+    - echo "password - ${GITEA_PASSWORD}"
+    - docker login -u "${GITEA_USERNAME}" -p "${GITEA_PASSWORD}" gitea.jrzylab.xyz
     - cd frontend/
     - docker build -t gitea.jrzylab.xyz/ramon/weather-app/weather-frontend:"${VERSION}"-dev .
     - docker tag gitea.jrzylab.xyz/ramon/weather-app/weather-backend:"${VERSION}"-dev gitea.jrzylab.xyz/ramon/weather-app/weather-backend:latest
