@@ -68,8 +68,9 @@ steps:
     PASSWORD:
       from_secret: WEATHER_APP_PASSWORD
   commands:
-    - echo "username - $${USERNAME}"
-    - echo "password - $${PASSWORD}"
+    - env
+    - echo "username - ${USERNAME}"
+    - echo "password - ${PASSWORD}"
     - docker login -u $USERNAME -p $PASSWORD gitea.jrzylab.xyz
     - cd frontend/
     - docker build -t gitea.jrzylab.xyz/ramon/weather-app/weather-frontend:"${VERSION}"-dev .
