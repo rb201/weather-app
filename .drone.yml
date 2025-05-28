@@ -59,7 +59,7 @@ steps:
   image: docker:dind
   volumes:
   - name: dockersock
-    path: /var/run
+    path: /var/run/docker.sock
   environment:
     USERNAME:
       from_secret: GITEA_USERNAME
