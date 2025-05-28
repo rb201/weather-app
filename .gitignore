@@ -15,3 +15,7 @@
 
 # React
 **/node_modules
+
+
+# Misc
+.vscode
