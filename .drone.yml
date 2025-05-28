@@ -70,6 +70,8 @@ steps:
   commands:
     - env
     - echo "${TEST}"
+    - echo "$TEST"
+    - echo $TEST
     - echo "${PASSWORD}" | docker login --username "${USERNAME}" gitea.jrzylab.xyz --password-stdin
     - cd frontend/
     - docker build -t gitea.jrzylab.xyz/ramon/weather-app/weather-frontend:"${VERSION}"-dev .
