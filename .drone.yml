@@ -46,7 +46,7 @@ steps:
     PASSWORD:
       from_secret: GITEA_PASSWORD
   commands:
-    - echo "${PASSWORD}" | docker login --username "${USERNAME}" gitea.jrzylab.xyz --password-stdin
+    - echo "$PASSWORD" | docker login --username "$USERNAME" gitea.jrzylab.xyz --password-stdin
     - cd backend/
     - docker build -t gitea.jrzylab.xyz/ramon/weather-app/weather-backend:"${VERSION}"-dev .
     - docker tag gitea.jrzylab.xyz/ramon/weather-app/weather-backend:"${VERSION}"-dev gitea.jrzylab.xyz/ramon/weather-app/weather-backend:latest
@@ -72,7 +72,7 @@ steps:
     - echo "${TEST}"
     - echo "$TEST"
     - echo $TEST
-    - echo "${PASSWORD}" | docker login --username "${USERNAME}" gitea.jrzylab.xyz --password-stdin
+    - echo "$PASSWORD" | docker login --username "$USERNAME" gitea.jrzylab.xyz --password-stdin
     - cd frontend/
     - docker build -t gitea.jrzylab.xyz/ramon/weather-app/weather-frontend:"${VERSION}"-dev .
     - docker tag gitea.jrzylab.xyz/ramon/weather-app/weather-backend:"${VERSION}"-dev gitea.jrzylab.xyz/ramon/weather-app/weather-backend:latest
