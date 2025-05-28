@@ -20,19 +20,6 @@
         - curl
         - nfsv4-client-utils
         state: latest
-
-    - name: Create dir for mount
-      ansible.builtin.file:
-        path: /mnt/apps/weather-app
-        state: directory
-
-    - name: Mount storage
-      ansible.posix.mount:
-        src: nfs.jrzylab.xyz:/data/app_data/weather-app
-        path: /mnt/apps/weather-app
-        fstype: nfs
-        boot: true
-        state: mounted
     
     - name: Fetch oh-my-zsh script
       ansible.builtin.get_url:
