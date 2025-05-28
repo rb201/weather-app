@@ -70,7 +70,7 @@ steps:
     - ls -lha /var/run
     - ls -lha /var/run/docker.sock
     - echo "$PASSWORD" | docker login --username "$USERNAME" gitea.jrzylab.xyz --password-stdin
-    - cd frontend/
+    - cd frontend/weather-app/
     - docker build -t gitea.jrzylab.xyz/ramon/weather-app/weather-frontend:0.1.0-dev .
     - docker tag gitea.jrzylab.xyz/ramon/weather-app/weather-backend:0.1.0-dev gitea.jrzylab.xyz/ramon/weather-app/weather-backend:latest
     - docker push gitea.jrzylab.xyz/ramon/weather-app/weather-backend:0.1.0-dev
