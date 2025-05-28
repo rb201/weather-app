@@ -65,8 +65,11 @@ steps:
       from_secret: GITEA_USERNAME
     PASSWORD:
       from_secret: GITEA_PASSWORD
+    TEST:
+      from_secret: TESTSECRET
   commands:
     - env
+    - echo "${TEST}"
     - echo "${PASSWORD}" | docker login --username "${USERNAME}" gitea.jrzylab.xyz --password-stdin
     - cd frontend/
     - docker build -t gitea.jrzylab.xyz/ramon/weather-app/weather-frontend:"${VERSION}"-dev .
