@@ -4,7 +4,7 @@ from prometheus_client import generate_latest, CollectorRegistry, Counter, Gauge
 
 from .data_fetcher import WeatherFetcher
 
-origins = ["http://localhost:5173"]
+origins = ["http://*:3000"]
 
 app = FastAPI()
 app.add_middleware(CORSMiddleware, allow_origins=origins, allow_methods=["GET"])
