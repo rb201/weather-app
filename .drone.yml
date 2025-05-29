@@ -80,7 +80,6 @@ steps:
 
 volumes:
 - name: dockersock
-  # temp: {}
   host:
     path: /var/run/docker.sock
 
