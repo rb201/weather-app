@@ -20,4 +20,4 @@ spec:
     - lb-ip-pool
   nodeSelectors:
   - matchLabels:
-      kubernetes.io/worker: "true"
+      node-role.kubernetes.io/worker: "true"
