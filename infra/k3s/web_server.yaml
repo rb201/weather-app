@@ -52,13 +52,14 @@ spec:
   selector:
     matchLabels:
       app: weather
-      stack: frontend
+      tier: frontend
+      env: dev
   replicas: 3
   template:
     metadata:
       labels:
         app: weather
-        stack: frontend
+        tier: frontend
         env: dev
     spec:
       containers:
@@ -115,7 +116,7 @@ spec:
   ports:
     - name: entry
       protocol: TCP
-      port: 80
+      port: 3000
       targetPort: frontend-port
   type: LoadBalancer
 
@@ -136,7 +137,7 @@ spec:
             backend:
               service:
                 name: weather-frontend
-                port: 
+                port:
                   number: 3000
 
 ---
@@ -145,5 +146,5 @@ kind: Secret
 metadata:
   name: registry-login
 data:
-  .dockerconfigjson: 
+  .dockerconfigjson:
 type: kubernetes.io/dockerconfigjson
