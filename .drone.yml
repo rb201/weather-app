@@ -99,9 +99,10 @@ steps:
       from_secret: KUBECONFIG
   commands:
     - cd frontend/weather-app/
+    - base64 -d $KUBECONFIG64 > ./kubeconfig
     - VERSION=`cat VERSION`
-    - kubectl set image deployment/weather-frontend weather-frontend=gitea.jrzylab.xyz/ramon/weather-app/weather-frontend:"$VERSION"-dev
-    - kubectl rollout status deployment/weather-backend
+    - kubectl --kubeconfig ./kubeconfig set image deployment/weather-frontend weather-frontend=gitea.jrzylab.xyz/ramon/weather-app/weather-frontend:"$VERSION"-dev
+    - kubectl --kubeconfig ./kubeconfig rollout status deployment/weather-backend
   depends_on:
     - build_backend_image
     - build_frontend_image
