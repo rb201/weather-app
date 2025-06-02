@@ -88,7 +88,7 @@ steps:
     # - VERSION=`cat VERSION`
     - cd /tmp
     - echo $KUBECONFIG64 > /tmp/kubeconfig64
-    - base64 -d $KUBECONFIG64 > /tmp/kubeconfig
+    - base64 -d /tmp/kubeconfig64 > /tmp/kubeconfig
     - pwd
     - ls -lha
     - cat /tmp/kubeconfig
