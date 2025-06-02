@@ -84,6 +84,7 @@ steps:
     KUBECONFIG:
       from_secret: KUBECONFIG
   commands:
+    - cd backend/
     - echo $KUBECONFIG
     - VERSION=`cat VERSION`
     - cd /tmp
@@ -91,7 +92,6 @@ steps:
     - pwd
     - ls -lha
     - cat /tmp/kubeconfig
-    - cd backend/
     - kubectl --kubeconfig /tmp/kubeconfig set image deployment/weather-backend weather-backend=gitea.jrzylab.xyz/ramon/weather-app/weather-backend:"$VERSION"-dev
     - kubectl --kubeconfig /tmp/kubeconfig rollout status deployment/weather-backend
   # depends_on:
