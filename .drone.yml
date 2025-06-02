@@ -67,9 +67,6 @@ steps:
     PASSWORD:
       from_secret: GITEA_PASSWORD
   commands:
-    - pwd
-    - ls -lha /var/run
-    - ls -lha /var/run/docker.sock
     - echo "$PASSWORD" | docker login --username "$USERNAME" gitea.jrzylab.xyz --password-stdin
     - cd frontend/weather-app/
     - VERSION=`cat VERSION`
@@ -84,11 +81,11 @@ steps:
     KUBECONFIG64:
       from_secret: KUBECONFIG64
   commands:
+    - cd backend/
+    - VERSION=`cat VERSION`
     - cd /tmp
     - echo $KUBECONFIG64 > /tmp/kubeconfig64
     - base64 -d /tmp/kubeconfig64 > /tmp/kubeconfig
-    - cd backend/
-    - VERSION=`cat VERSION`
     - kubectl --kubeconfig /tmp/kubeconfig set image deployment/weather-backend weather-backend=gitea.jrzylab.xyz/ramon/weather-app/weather-backend:"$VERSION"-dev
     - kubectl --kubeconfig /tmp/kubeconfig rollout status deployment/weather-backend
   depends_on:
@@ -101,11 +98,11 @@ steps:
     KUBECONFIG64:
       from_secret: KUBECONFIG64
   commands:
+    - cd frontend/weather-app/
+    - VERSION=`cat VERSION`
     - cd /tmp
     - echo $KUBECONFIG64 > /tmp/kubeconfig64
     - base64 -d /tmp/kubeconfig64 > /tmp/kubeconfig
-    - cd frontend/weather-app/
-    - VERSION=`cat VERSION`
     - kubectl --kubeconfig /tmp/kubeconfig set image deployment/weather-frontend weather-frontend=gitea.jrzylab.xyz/ramon/weather-app/weather-frontend:"$VERSION"-dev
     - kubectl --kubeconfig /tmp/kubeconfig rollout status deployment/weather-backend
   depends_on:
