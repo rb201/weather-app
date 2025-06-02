@@ -81,11 +81,11 @@ steps:
 - name: deploy_backend
   image: alpine/k8s:1.33.1
   environment:
-    KUBECONFIG:
+    KUBECONFIG64:
       from_secret: KUBECONFIG64
   commands:
     - cd backend/
-    - echo $KUBECONFIG
+    - echo $KUBECONFIG64
     - VERSION=`cat VERSION`
     - cd /tmp
     - base64 -d $KUBECONFIG64 > /tmp/kubeconfig
@@ -101,7 +101,7 @@ steps:
 - name: deploy_frontend
   image: alpine/k8s:1.33.1
   environment:
-    KUBECONFIG:
+    KUBECONFIG64:
       from_secret: KUBECONFIG64
   commands:
     - cd frontend/weather-app/
