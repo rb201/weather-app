@@ -48,10 +48,9 @@ steps:
   commands:
     - echo "$PASSWORD" | docker login --username "$USERNAME" gitea.jrzylab.xyz --password-stdin
     - cd backend/
-    - docker build -t gitea.jrzylab.xyz/ramon/weather-app/weather-backend:0.1.0-dev .
-    - docker tag gitea.jrzylab.xyz/ramon/weather-app/weather-backend:0.1.0-dev gitea.jrzylab.xyz/ramon/weather-app/weather-backend:latest
-    - docker push gitea.jrzylab.xyz/ramon/weather-app/weather-backend:0.1.0-dev
-    - docker push gitea.jrzylab.xyz/ramon/weather-app/weather-backend:latest
+    - VERSION=`cat VERSION`
+    - docker build -t gitea.jrzylab.xyz/ramon/weather-app/weather-backend:"$VERSION"-dev .
+    - docker push gitea.jrzylab.xyz/ramon/weather-app/weather-backend:"$VERSION"-dev
   depends_on:
     - backend-unit-tests
 
@@ -71,12 +70,18 @@ steps:
     - ls -lha /var/run/docker.sock
     - echo "$PASSWORD" | docker login --username "$USERNAME" gitea.jrzylab.xyz --password-stdin
     - cd frontend/weather-app/
-    - docker build -t gitea.jrzylab.xyz/ramon/weather-app/weather-frontend:0.1.0-dev .
-    - docker tag gitea.jrzylab.xyz/ramon/weather-app/weather-frontend:0.1.0-dev gitea.jrzylab.xyz/ramon/weather-app/weather-frontend:latest
-    - docker push gitea.jrzylab.xyz/ramon/weather-app/weather-frontend:0.1.0-dev
-    - docker push gitea.jrzylab.xyz/ramon/weather-app/weather-frontend:latest
+    - VERSION=`cat VERSION`
+    - docker build -t gitea.jrzylab.xyz/ramon/weather-app/weather-frontend:"$VERSION"-dev .
+    - docker push gitea.jrzylab.xyz/ramon/weather-app/weather-frontend:"$VERSION"-dev
   depends_on:
     - frontend-unit-tests
+
+# - name: Deploy to dev
+#   image: alpine/k8s:1.33.1
+#   environment:
+#     KUBECONFIG:
+#       from_secret: kubeconfighash
+#   commands:
 
 volumes:
 - name: dockersock
