@@ -82,7 +82,7 @@ steps:
   image: alpine/k8s:1.33.1
   environment:
     KUBECONFIG:
-      from_secret: KUBECONFIG
+      from_secret: KUBECONFIG64
   commands:
     - cd backend/
     - echo $KUBECONFIG
@@ -102,7 +102,7 @@ steps:
   image: alpine/k8s:1.33.1
   environment:
     KUBECONFIG:
-      from_secret: KUBECONFIG
+      from_secret: KUBECONFIG64
   commands:
     - cd frontend/weather-app/
     - base64 -d $KUBECONFIG64 > ./kubeconfig
