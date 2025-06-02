@@ -84,34 +84,35 @@ steps:
     KUBECONFIG64:
       from_secret: KUBECONFIG64
   commands:
-    - cd backend/
-    - echo $KUBECONFIG64
-    - VERSION=`cat VERSION`
+    # - cd backend/
+    # - VERSION=`cat VERSION`
     - cd /tmp
+    - echo $KUBECONFIG64 > /tmp/kubeconfig64
     - base64 -d $KUBECONFIG64 > /tmp/kubeconfig
     - pwd
     - ls -lha
     - cat /tmp/kubeconfig
-    - kubectl --kubeconfig /tmp/kubeconfig set image deployment/weather-backend weather-backend=gitea.jrzylab.xyz/ramon/weather-app/weather-backend:"$VERSION"-dev
-    - kubectl --kubeconfig /tmp/kubeconfig rollout status deployment/weather-backend
+    - kubectl --kubeconfig /tmp/kubeconfig get svc
+    # - kubectl --kubeconfig /tmp/kubeconfig set image deployment/weather-backend weather-backend=gitea.jrzylab.xyz/ramon/weather-app/weather-backend:"$VERSION"-dev
+    # - kubectl --kubeconfig /tmp/kubeconfig rollout status deployment/weather-backend
   # depends_on:
   #   - build_backend_image
   #   - build_frontend_image
 
-- name: deploy_frontend
-  image: alpine/k8s:1.33.1
-  environment:
-    KUBECONFIG64:
-      from_secret: KUBECONFIG64
-  commands:
-    - cd frontend/weather-app/
-    - base64 -d $KUBECONFIG64 > ./kubeconfig
-    - VERSION=`cat VERSION`
-    - kubectl --kubeconfig ./kubeconfig set image deployment/weather-frontend weather-frontend=gitea.jrzylab.xyz/ramon/weather-app/weather-frontend:"$VERSION"-dev
-    - kubectl --kubeconfig ./kubeconfig rollout status deployment/weather-backend
-  # depends_on:
-  #   - build_backend_image
-  #   - build_frontend_image
+# - name: deploy_frontend
+#   image: alpine/k8s:1.33.1
+#   environment:
+#     KUBECONFIG64:
+#       from_secret: KUBECONFIG64
+#   commands:
+#     - cd frontend/weather-app/
+#     - base64 -d $KUBECONFIG64 > ./kubeconfig
+#     - VERSION=`cat VERSION`
+#     - kubectl --kubeconfig ./kubeconfig set image deployment/weather-frontend weather-frontend=gitea.jrzylab.xyz/ramon/weather-app/weather-frontend:"$VERSION"-dev
+#     - kubectl --kubeconfig ./kubeconfig rollout status deployment/weather-backend
+#   # depends_on:
+#   #   - build_backend_image
+#   #   - build_frontend_image
 
 volumes:
 - name: dockersock
