@@ -6,77 +6,77 @@ name: weather-app
 
 
 steps:
-# - name: backend_static_checks
-#   image: python:3.11
-#   commands:
-#     - pip install -r backend/requirements-dev.txt
-#     - pip install -r backend/requirements.txt
-#     - ruff check backend/*.py --fix
-#     - ruff format backend/*.py
-#     - mypy --config-file backend/pyproject.toml backend/
+- name: backend_static_checks
+  image: python:3.11
+  commands:
+    - pip install -r backend/requirements-dev.txt
+    - pip install -r backend/requirements.txt
+    - ruff check backend/*.py --fix
+    - ruff format backend/*.py
+    - mypy --config-file backend/pyproject.toml backend/
 
-# - name: frontend_static_checks
-#   image: node
-#   commands:
-#     - echo "npm run lint"
-#     - echo "code is perfect, no analysis needed"
+- name: frontend_static_checks
+  image: node
+  commands:
+    - echo "npm run lint"
+    - echo "code is perfect, no analysis needed"
 
-# - name: backend_unit_tests
-#   image: python:3.11
-#   commands:
-#     - pip install -r backend/requirements.txt
-#     - pip install -r backend/tests/requirements.txt
-#     - pytest backend/tests
-#   depends_on:
-#     - backend_static_checks
+- name: backend_unit_tests
+  image: python:3.11
+  commands:
+    - pip install -r backend/requirements.txt
+    - pip install -r backend/tests/requirements.txt
+    - pytest backend/tests
+  depends_on:
+    - backend_static_checks
 
-# - name: frontend_unit_tests
-#   image: python:3.11
-#   commands:
-#     - echo "100% sure this code works 100% of the time, every time. No test needed"
-#   depends_on:
-#     - frontend_static_checks
+- name: frontend_unit_tests
+  image: python:3.11
+  commands:
+    - echo "100% sure this code works 100% of the time, every time. No test needed"
+  depends_on:
+    - frontend_static_checks
 
-# - name: build_backend_image
-#   image: docker:dind
-#   volumes:
-#     - name: dockersock
-#       path: /var/run/docker.sock
-#   environment:
-#     USERNAME:
-#       from_secret: GITEA_USERNAME
-#     PASSWORD:
-#       from_secret: GITEA_PASSWORD
-#   commands:
-#     - echo "$PASSWORD" | docker login --username "$USERNAME" gitea.jrzylab.xyz --password-stdin
-#     - cd backend/
-#     - VERSION=`cat VERSION`
-#     - docker build -t gitea.jrzylab.xyz/ramon/weather-app/weather-backend:"$VERSION"-dev .
-#     - docker push gitea.jrzylab.xyz/ramon/weather-app/weather-backend:"$VERSION"-dev
-#   depends_on:
-#     - backend_unit_tests
+- name: build_backend_image
+  image: docker:dind
+  volumes:
+    - name: dockersock
+      path: /var/run/docker.sock
+  environment:
+    USERNAME:
+      from_secret: GITEA_USERNAME
+    PASSWORD:
+      from_secret: GITEA_PASSWORD
+  commands:
+    - echo "$PASSWORD" | docker login --username "$USERNAME" gitea.jrzylab.xyz --password-stdin
+    - cd backend/
+    - VERSION=`cat VERSION`
+    - docker build -t gitea.jrzylab.xyz/ramon/weather-app/weather-backend:"$VERSION"-dev .
+    - docker push gitea.jrzylab.xyz/ramon/weather-app/weather-backend:"$VERSION"-dev
+  depends_on:
+    - backend_unit_tests
 
-# - name: build_frontend_image
-#   image: docker:dind
-#   volumes:
-#     - name: dockersock
-#       path: /var/run/docker.sock
-#   environment:
-#     USERNAME:
-#       from_secret: GITEA_USERNAME
-#     PASSWORD:
-#       from_secret: GITEA_PASSWORD
-#   commands:
-#     - pwd
-#     - ls -lha /var/run
-#     - ls -lha /var/run/docker.sock
-#     - echo "$PASSWORD" | docker login --username "$USERNAME" gitea.jrzylab.xyz --password-stdin
-#     - cd frontend/weather-app/
-#     - VERSION=`cat VERSION`
-#     - docker build -t gitea.jrzylab.xyz/ramon/weather-app/weather-frontend:"$VERSION"-dev .
-#     - docker push gitea.jrzylab.xyz/ramon/weather-app/weather-frontend:"$VERSION"-dev
-#   depends_on:
-#     - frontend_unit_tests
+- name: build_frontend_image
+  image: docker:dind
+  volumes:
+    - name: dockersock
+      path: /var/run/docker.sock
+  environment:
+    USERNAME:
+      from_secret: GITEA_USERNAME
+    PASSWORD:
+      from_secret: GITEA_PASSWORD
+  commands:
+    - pwd
+    - ls -lha /var/run
+    - ls -lha /var/run/docker.sock
+    - echo "$PASSWORD" | docker login --username "$USERNAME" gitea.jrzylab.xyz --password-stdin
+    - cd frontend/weather-app/
+    - VERSION=`cat VERSION`
+    - docker build -t gitea.jrzylab.xyz/ramon/weather-app/weather-frontend:"$VERSION"-dev .
+    - docker push gitea.jrzylab.xyz/ramon/weather-app/weather-frontend:"$VERSION"-dev
+  depends_on:
+    - frontend_unit_tests
 
 - name: deploy_backend
   image: alpine/k8s:1.33.1
@@ -84,35 +84,33 @@ steps:
     KUBECONFIG64:
       from_secret: KUBECONFIG64
   commands:
-    # - cd backend/
-    # - VERSION=`cat VERSION`
     - cd /tmp
     - echo $KUBECONFIG64 > /tmp/kubeconfig64
     - base64 -d /tmp/kubeconfig64 > /tmp/kubeconfig
-    - pwd
-    - ls -lha
-    - cat /tmp/kubeconfig
-    - kubectl --kubeconfig /tmp/kubeconfig get svc
-    # - kubectl --kubeconfig /tmp/kubeconfig set image deployment/weather-backend weather-backend=gitea.jrzylab.xyz/ramon/weather-app/weather-backend:"$VERSION"-dev
-    # - kubectl --kubeconfig /tmp/kubeconfig rollout status deployment/weather-backend
-  # depends_on:
-  #   - build_backend_image
-  #   - build_frontend_image
+    - cd backend/
+    - VERSION=`cat VERSION`
+    - kubectl --kubeconfig /tmp/kubeconfig set image deployment/weather-backend weather-backend=gitea.jrzylab.xyz/ramon/weather-app/weather-backend:"$VERSION"-dev
+    - kubectl --kubeconfig /tmp/kubeconfig rollout status deployment/weather-backend
+  depends_on:
+    - build_backend_image
+    - build_frontend_image
 
-# - name: deploy_frontend
-#   image: alpine/k8s:1.33.1
-#   environment:
-#     KUBECONFIG64:
-#       from_secret: KUBECONFIG64
-#   commands:
-#     - cd frontend/weather-app/
-#     - base64 -d $KUBECONFIG64 > ./kubeconfig
-#     - VERSION=`cat VERSION`
-#     - kubectl --kubeconfig ./kubeconfig set image deployment/weather-frontend weather-frontend=gitea.jrzylab.xyz/ramon/weather-app/weather-frontend:"$VERSION"-dev
-#     - kubectl --kubeconfig ./kubeconfig rollout status deployment/weather-backend
-#   # depends_on:
-#   #   - build_backend_image
-#   #   - build_frontend_image
+- name: deploy_frontend
+  image: alpine/k8s:1.33.1
+  environment:
+    KUBECONFIG64:
+      from_secret: KUBECONFIG64
+  commands:
+    - cd /tmp
+    - echo $KUBECONFIG64 > /tmp/kubeconfig64
+    - base64 -d /tmp/kubeconfig64 > /tmp/kubeconfig
+    - cd frontend/weather-app/
+    - VERSION=`cat VERSION`
+    - kubectl --kubeconfig /tmp/kubeconfig set image deployment/weather-frontend weather-frontend=gitea.jrzylab.xyz/ramon/weather-app/weather-frontend:"$VERSION"-dev
+    - kubectl --kubeconfig /tmp/kubeconfig rollout status deployment/weather-backend
+  depends_on:
+    - build_backend_image
+    - build_frontend_image
 
 volumes:
 - name: dockersock
