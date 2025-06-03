@@ -18,7 +18,7 @@ spec:
     spec:
       containers:
         - name: weather-backend
-          image: gitea.jrzylab.xyz/ramon/weather-app/weather-backend:0.1.0-dev
+          image: gitea.jrzylab.xyz/ramon/weather-app/weather-backend:0.3.0-dev
           ports:
             - containerPort: 8000
               name: backend-port
@@ -64,7 +64,7 @@ spec:
     spec:
       containers:
         - name: weather-frontend
-          image: gitea.jrzylab.xyz/ramon/weather-app/weather-frontend:0.1.0-dev
+          image: gitea.jrzylab.xyz/ramon/weather-app/weather-frontend:0.4.0-dev
           ports:
             - containerPort: 3000
               name: frontend-port
@@ -116,7 +116,7 @@ spec:
   ports:
     - name: entry
       protocol: TCP
-      port: 3000
+      port: 80
       targetPort: frontend-port
   type: LoadBalancer
 
@@ -133,21 +133,7 @@ spec:
       http:
         paths:
           - pathType: Prefix
-            path: /api/current
-            backend:
-              service:
-                name: weather-backend
-                port:
-                  number: 8000
-          - pathType: Prefix
-            path: /api/health
-            backend:
-              service:
-                name: weather-backend
-                port:
-                  number: 8000
-          - pathType: Prefix
-            path: /api/metrics
+            path: /api
             backend:
               service:
                 name: weather-backend

@@ -37,7 +37,7 @@ async def http_requests_metrics(request: Request):
     active_http_requests.dec()
 
 
-@app.get("/api/current/")
+@app.get("/current/")
 async def get_current_weather(
     city: str, state: str, dep: str = Depends(http_requests_metrics)
 ):
@@ -48,11 +48,11 @@ async def get_current_weather(
     return current_weather_data
 
 
-@app.get("/api/health")
+@app.get("/health")
 async def health_status(dep: str = Depends(http_requests_metrics)):
     return {"service": "ok"}
 
 
-@app.get("/api/metrics")
+@app.get("/metrics")
 def metrics():
     return generate_latest(metrics_registry).decode("utf8").split("\n")
