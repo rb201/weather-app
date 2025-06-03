@@ -9,6 +9,8 @@ origins = ["http://*:3000"]
 app = FastAPI()
 app.add_middleware(CORSMiddleware, allow_origins=origins, allow_methods=["GET"])
 
+print("FastAPI started")
+
 metrics_registry = CollectorRegistry()
 
 active_http_requests = Gauge(
@@ -41,6 +43,7 @@ async def http_requests_metrics(request: Request):
 async def get_current_weather(
     city: str, state: str, dep: str = Depends(http_requests_metrics)
 ):
+    print("Accessed /current")
     wf = WeatherFetcher("weather.db", city=city, state=state)
     current_weather_data = wf.get_current_weather()
     print(current_weather_data)
@@ -50,9 +53,11 @@ async def get_current_weather(
 
 @app.get("/health")
 async def health_status(dep: str = Depends(http_requests_metrics)):
+    print("Accessed /health")
     return {"service": "ok"}
 
 
 @app.get("/metrics")
 def metrics():
+    print("Accessed /metrics")
     return generate_latest(metrics_registry).decode("utf8").split("\n")
