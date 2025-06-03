@@ -133,33 +133,33 @@ spec:
       http:
         paths:
           - pathType: Prefix
+            path: /api/current
+            backend:
+              service:
+                name: weather-backend
+                port:
+                  number: 8000
+          - pathType: Prefix
+            path: /api/health
+            backend:
+              service:
+                name: weather-backend
+                port:
+                  number: 8000
+          - pathType: Prefix
+            path: /api/metrics
+            backend:
+              service:
+                name: weather-backend
+                port:
+                  number: 8000
+          - pathType: Prefix
             path: /
             backend:
               service:
                 name: weather-frontend
                 port:
                   number: 3000
-          - pathType: Prefix
-            path: /current
-            backend:
-              service:
-                name: weather-backend
-                port:
-                  number: 8000
-          - pathType: Prefix
-            path: /health
-            backend:
-              service:
-                name: weather-backend
-                port:
-                  number: 8000
-          - pathType: Prefix
-            path: /metrics
-            backend:
-              service:
-                name: weather-backend
-                port:
-                  number: 8000
 
 ---
 apiVersion: v1
