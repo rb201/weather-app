@@ -18,7 +18,7 @@ export default function Search({ searchInput, setSearchInput, setWeatherData, se
 
         try {
             console.log("In the try block for fetching data")
-            const res = await fetch(`/current/?${urlParams}`);
+            const res = await fetch(`/api/current/?${urlParams}`);
             const currentWeatherData = await res.json();
 
             if (!res.ok) {
