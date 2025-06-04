@@ -27,6 +27,10 @@ class WeatherFetcher:
         longitude: Optional[float] = None,  # not supported yet
         location_id: Optional[int] = None,
     ):
+        # Set to default location of NFS. Otherwise, expect in the work dir of local dev
+        if db_path == "weather.db":
+            db_path = "/data/weather.db"
+
         # if longitude is None and latitude is None and city is None and state is None:
         if city is None and state is None:
             # print("Please include the coordinates of your location, or city and state")
