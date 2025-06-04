@@ -52,7 +52,9 @@ steps:
     - cd backend/
     - VERSION=`cat VERSION`
     - docker build -t gitea.jrzylab.xyz/ramon/weather-app/weather-backend:"$VERSION"-dev .
+    - docker tag gitea.jrzylab.xyz/ramon/weather-app/weather-backend:"$VERSION"-dev gitea.jrzylab.xyz/ramon/weather-app/weather-backend:latest-dev
     - docker push gitea.jrzylab.xyz/ramon/weather-app/weather-backend:"$VERSION"-dev
+    - docker push gitea.jrzylab.xyz/ramon/weather-app/weather-backend:latest-dev
   depends_on:
     - backend_unit_tests
 
@@ -71,7 +73,9 @@ steps:
     - cd frontend/weather-app/
     - VERSION=`cat VERSION`
     - docker build -t gitea.jrzylab.xyz/ramon/weather-app/weather-frontend:"$VERSION"-dev .
+    - docker tag gitea.jrzylab.xyz/ramon/weather-app/weather-frontend:"$VERSION"-dev gitea.jrzylab.xyz/ramon/weather-app/weather-frontend:latest-dev
     - docker push gitea.jrzylab.xyz/ramon/weather-app/weather-frontend:"$VERSION"-dev
+    - docker push gitea.jrzylab.xyz/ramon/weather-app/weather-frontend:latest-dev
   depends_on:
     - frontend_unit_tests
 
