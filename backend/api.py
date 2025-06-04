@@ -1,15 +1,9 @@
 from fastapi import Depends, FastAPI, Request
-from fastapi.middleware.cors import CORSMiddleware
 from prometheus_client import generate_latest, CollectorRegistry, Counter, Gauge
 
 from .data_fetcher import WeatherFetcher
 
-origins = ["http://*:3000"]
-
 app = FastAPI()
-app.add_middleware(CORSMiddleware, allow_origins=origins, allow_methods=["GET"])
-
-print("FastAPI started")
 
 metrics_registry = CollectorRegistry()
 
