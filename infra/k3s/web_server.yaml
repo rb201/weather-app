@@ -18,7 +18,7 @@ spec:
     spec:
       containers:
         - name: weather-backend
-          image: gitea.jrzylab.xyz/ramon/weather-app/weather-backend:0.3.0-dev
+          image: gitea.jrzylab.xyz/ramon/weather-app/weather-backend:latest-dev
           ports:
             - containerPort: 8000
               name: backend-port
@@ -64,7 +64,7 @@ spec:
     spec:
       containers:
         - name: weather-frontend
-          image: gitea.jrzylab.xyz/ramon/weather-app/weather-frontend:0.4.0-dev
+          image: gitea.jrzylab.xyz/ramon/weather-app/weather-frontend:latest-dev
           ports:
             - containerPort: 3000
               name: frontend-port
@@ -118,7 +118,16 @@ spec:
       protocol: TCP
       port: 80
       targetPort: frontend-port
-  type: LoadBalancer
+
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: weather-middleware-strip-prefix
+spec:
+  stripPrefix:
+    prefixes:
+      - /api
 
 ---
 apiVersion: networking.k8s.io/v1
@@ -127,6 +136,8 @@ metadata:
   name: weather
   labels:
     app: weather
+  annotations:
+    traefik.ingress.kubernetes.io/router.middlewares: default-weather-middleware-strip-prefix@kubernetescrd
 spec:
   rules:
     - host: weather.jrzylab.xyz
@@ -145,7 +156,7 @@ spec:
               service:
                 name: weather-frontend
                 port:
-                  number: 3000
+                  number: 80
 
 ---
 apiVersion: v1
