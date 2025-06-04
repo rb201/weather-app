@@ -11,13 +11,11 @@ export default function Search({ searchInput, setSearchInput, setWeatherData, se
     }
 
     const fetchWeatherData = async () => {
-        console.log("In the fetch data function")
         const [ city, state ] = searchInput.split(',').map( word => word.trim())
 
         let urlParams = new URLSearchParams({city, state})
 
         try {
-            console.log("In the try block for fetching data")
             const res = await fetch(`/api/current/?${urlParams}`);
             const currentWeatherData = await res.json();
 
