@@ -22,6 +22,12 @@ spec:
           ports:
             - containerPort: 8000
               name: backend-port
+          env:
+            - name: API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: backend-api-token
+                  key: token
           resources:
             requests:
               memory: 256Mi
@@ -166,3 +172,12 @@ metadata:
 data:
   .dockerconfigjson:
 type: kubernetes.io/dockerconfigjson
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: backend-api-token
+type: Opaque
+data:
+  token:
