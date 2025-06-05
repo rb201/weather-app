@@ -1,0 +1,15 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: weather-frontend
+spec:
+  selector:
+    app: weather
+    tier: frontend
+    env: dev
+  ports:
+    - name: entry
+      protocol: TCP
+      port: 80
+      targetPort: frontend-port
