@@ -1,0 +1,9 @@
+scripts
+tests
+.*_cache
+.pre-commit-config.yaml
+pytest.ini
+requirements-dev.in
+requirements-dev.txt
+schema.sql
+weather.db

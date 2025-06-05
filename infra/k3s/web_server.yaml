@@ -1,0 +1,183 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: weather-backend
+spec:
+  selector:
+    matchLabels:
+      app: weather
+      tier: backend
+      env: dev
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: weather
+        tier: backend
+        env: dev
+    spec:
+      containers:
+        - name: weather-backend
+          image: gitea.jrzylab.xyz/ramon/weather-app/weather-backend:latest-dev
+          ports:
+            - containerPort: 8000
+              name: backend-port
+          env:
+            - name: API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: backend-api-token
+                  key: token
+          resources:
+            requests:
+              memory: 256Mi
+              cpu: 250m
+            limits:
+              memory: 512Mi
+              cpu: 500m
+          volumeMounts:
+            - name: sqlitedb
+              mountPath: /data
+      imagePullSecrets:
+        - name: registry-login
+      volumes:
+        - name: sqlitedb
+          nfs:
+            server: nfs.jrzylab.xyz
+            path: /data/app_data/weather-app
+            readOnly: false
+      nodeSelector:
+        node-role.kubernetes.io/worker: "true"
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: weather-frontend
+spec:
+  selector:
+    matchLabels:
+      app: weather
+      tier: frontend
+      env: dev
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: weather
+        tier: frontend
+        env: dev
+    spec:
+      containers:
+        - name: weather-frontend
+          image: gitea.jrzylab.xyz/ramon/weather-app/weather-frontend:latest-dev
+          ports:
+            - containerPort: 3000
+              name: frontend-port
+          resources:
+            requests:
+              memory: 256Mi
+              cpu: 250m
+            limits:
+              memory: 512Mi
+              cpu: 500m
+          volumeMounts:
+            - name: sqlitedb
+              mountPath: /data
+      volumes:
+        - name: sqlitedb
+          nfs:
+            server: nfs.jrzylab.xyz
+            path: /data/app_data/weather-app
+            readOnly: false
+      nodeSelector:
+        node-role.kubernetes.io/worker: "true"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: weather-backend
+spec:
+  selector:
+    app: weather
+    tier: backend
+    env: dev
+  ports:
+    - name: entry
+      protocol: TCP
+      port: 8000
+      targetPort: backend-port
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: weather-frontend
+spec:
+  selector:
+    app: weather
+    tier: frontend
+    env: dev
+  ports:
+    - name: entry
+      protocol: TCP
+      port: 80
+      targetPort: frontend-port
+
+---
+apiVersion: traefik.io/v1alpha1
+kind: Middleware
+metadata:
+  name: weather-middleware-strip-prefix
+spec:
+  stripPrefix:
+    prefixes:
+      - /api
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: weather
+  labels:
+    app: weather
+  annotations:
+    traefik.ingress.kubernetes.io/router.middlewares: default-weather-middleware-strip-prefix@kubernetescrd
+spec:
+  rules:
+    - host: weather.jrzylab.xyz
+      http:
+        paths:
+          - pathType: Prefix
+            path: /api
+            backend:
+              service:
+                name: weather-backend
+                port:
+                  number: 8000
+          - pathType: Prefix
+            path: /
+            backend:
+              service:
+                name: weather-frontend
+                port:
+                  number: 80
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: registry-login
+data:
+  .dockerconfigjson:
+type: kubernetes.io/dockerconfigjson
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: backend-api-token
+type: Opaque
+data:
+  token:

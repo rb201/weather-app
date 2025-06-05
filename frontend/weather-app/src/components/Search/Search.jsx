@@ -16,7 +16,7 @@ export default function Search({ searchInput, setSearchInput, setWeatherData, se
         let urlParams = new URLSearchParams({city, state})
 
         try {
-            const res = await fetch(`http://localhost:8000/current/?${urlParams}`);
+            const res = await fetch(`/api/current/?${urlParams}`);
             const currentWeatherData = await res.json();
 
             if (!res.ok) {

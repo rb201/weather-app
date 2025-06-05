@@ -1,0 +1,6 @@
+fastapi[standard]~=0.115.8
+geopy~=2.4.1
+prometheus_client~=0.21.1
+python-dotenv~=1.0.1
+requests~=2.32.3
+types-requests~=2.32.0

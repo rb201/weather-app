@@ -1,4 +1,0 @@
-fastapi[standard]
-geopy
-python-dotenv
-requests
