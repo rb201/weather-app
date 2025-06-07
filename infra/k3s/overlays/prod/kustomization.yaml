@@ -1,0 +1,24 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+
+kind: Kustomization
+
+labels:
+  - pairs:
+      env: prod
+    includeSelectors: true
+
+namespace: prod
+
+images:
+  - name: gitea.jrzylab.xyz/ramon/weather-app/weather-backend
+    newTag: TAG
+  - name: gitea.jrzylab.xyz/ramon/weather-app/weather-frontend
+    newTag: TAG
+
+resources:
+  - ../../base
+
+patches:
+  - path: backend-deployment.yaml
+  - path: frontend-deployment.yaml
+  - path: ingress.yaml
