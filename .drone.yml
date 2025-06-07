@@ -118,7 +118,6 @@ volumes:
 
 trigger:
   branch:
-    - master
     - development
   event:
     - push
