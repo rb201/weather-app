@@ -7,18 +7,16 @@ spec:
     matchLabels:
       app: weather
       tier: backend
-      env: dev
   replicas: 3
   template:
     metadata:
       labels:
         app: weather
         tier: backend
-        env: dev
     spec:
       containers:
         - name: weather-backend
-          image: gitea.jrzylab.xyz/ramon/weather-app/weather-backend:latest-dev
+          image: gitea.jrzylab.xyz/ramon/weather-app/weather-backend
           ports:
             - containerPort: 8000
               name: backend-port

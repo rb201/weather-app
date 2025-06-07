@@ -7,7 +7,6 @@ spec:
   selector:
     app: weather
     tier: backend
-    env: dev
   ports:
     - name: entry
       protocol: TCP
