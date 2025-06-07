@@ -5,8 +5,6 @@ metadata:
   name: weather
   labels:
     app: weather
-  annotations:
-    traefik.ingress.kubernetes.io/router.middlewares: default-weather-middleware-strip-prefix@kubernetescrd
 spec:
   rules:
     - host: weather.jrzylab.xyz

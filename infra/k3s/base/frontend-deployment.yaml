@@ -8,18 +8,16 @@ spec:
     matchLabels:
       app: weather
       tier: frontend
-      env: dev
   replicas: 3
   template:
     metadata:
       labels:
         app: weather
         tier: frontend
-        env: dev
     spec:
       containers:
         - name: weather-frontend
-          image: gitea.jrzylab.xyz/ramon/weather-app/weather-frontend:latest-dev
+          image: gitea.jrzylab.xyz/ramon/weather-app/weather-frontend
           ports:
             - containerPort: 3000
               name: frontend-port
@@ -30,14 +28,5 @@ spec:
             limits:
               memory: 512Mi
               cpu: 500m
-          volumeMounts:
-            - name: sqlitedb
-              mountPath: /data
-      volumes:
-        - name: sqlitedb
-          nfs:
-            server: nfs.jrzylab.xyz
-            path: /data/app_data/weather-app
-            readOnly: false
       nodeSelector:
         node-role.kubernetes.io/worker: "true"
