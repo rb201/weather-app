@@ -1,0 +1,20 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: weather-backend
+spec:
+  template:
+    spec:
+      containers:
+        - name: weather-backend
+          resources:
+            requests:
+              memory: 128Mi
+              cpu: 200m
+      volumes:
+        - name: sqlitedb
+          nfs:
+            server: nfs.jrzylab.xyz
+            path: /data/app_data/weather-app/dev
+            readOnly: false
