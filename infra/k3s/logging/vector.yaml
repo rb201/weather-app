@@ -1,0 +1,68 @@
+role: Agent
+
+service:
+  ports:
+    - name: prom-exporter
+      port: 9598
+
+containerPorts:
+  - name: prom-exporter
+    containerPort: 9598
+    protocol: TCP  
+
+customConfig:
+  data_dir: /var/lib/vector
+
+  api:
+    enabled: true
+    address: 0.0.0.0:8686
+    playground: false
+
+  sources:
+    kubernetes_logs:
+      type: kubernetes_logs
+
+    # host_metrics:
+    #   type: host_metrics
+    #   collectors:
+    #     - cpu
+    #     - memory
+    #     - network
+    #     - load
+    #   namespace: host
+    #   scrape_interval_secs: 15
+
+    system_logs:
+      type: file
+      exclude:
+        - /var/log/pods
+      include:
+        - /var/log/boot.log
+        - /var/log/cron
+        - /var/log/firewalld
+        - /var/log/messages
+        - /var/log/secure
+      ignore_older_secs: 3600
+      line_delimiter: "\n"
+
+
+  transforms:
+    kubernetes_container_logs:
+      type: remap
+      inputs:
+        - kubernetes_logs
+      source: |
+        .message = .message
+        .container = .kubernetes.container_name
+        .pod = .kubernetes.pod_name
+        .namespace = .kubernetes.pod_namespace
+
+  # sinks:
+  #   logging:
+  #     compression: gzip
+  #     endpoint: http://greptimedb.default:4000
+  #     table: kubernetes_container_logs
+  #     pipeline_name: kubernetes_container_logs
+  #     inputs:
+  #       - kubernetes_container_logs
+  #     type: greptimedb_logs
