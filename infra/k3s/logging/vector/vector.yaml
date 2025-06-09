@@ -49,27 +49,44 @@ customConfig:
       line_delimiter: "\n"
 
   transforms:
-    kubernetes_container_logs:
+    kubernetes_logs_transform:
       type: remap
       inputs:
         - kubernetes_logs
       source: |
         .container = .kubernetes.container_name
-        .host = .kubernetes.pod_node_name
         .message = .message
         .namespace = .kubernetes.pod_namespace
         .pod = .kubernetes.pod_name
 
+    system_logs_transform:
+      type: remap
+      inputs:
+        - system_logs
+      source: |
+        .host = get_hostname!()
+
   sinks:
-    logging:
+    kube-logs:
       compression: gzip
       endpoints:
         - http://vls-victoria-logs-single-server.logging.svc.cluster.local.:9428/insert/elasticsearch
       inputs:
-        - kubernetes_container_logs
-        - system_logs
+        - kubernetes_logs_transform
       pipeline: weather-logs
       query:
         _msg_field: message
-        _stream_fields: host,container,namespace
+        _stream_fields: namespace,container,pod
+      type: elasticsearch
+
+    sys-logs:
+      compression: gzip
+      endpoints:
+        - http://vls-victoria-logs-single-server.logging.svc.cluster.local.:9428/insert/elasticsearch
+      inputs:
+        - system_logs_transform
+      pipeline: weather-logs
+      query:
+        _msg_field: message
+        _stream_fields: host
       type: elasticsearch
