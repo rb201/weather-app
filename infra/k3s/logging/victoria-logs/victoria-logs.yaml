@@ -37,24 +37,27 @@ server:
       cpu: 500m
       memory: 512Mi
 
-  # -- Security context to be added to server pods
-  securityContext:
-    enabled: true
-    allowPrivilegeEscalation: false
-    capabilities:
-      drop:
-        - ALL
-    readOnlyRootFilesystem: true
-
   service:
     targetPort: http
     servicePort: 9428
-    type: NodePort
+    type: ClusterIP
 
-  # -- Pod's termination grace period in seconds
-  terminationGracePeriodSeconds: 60
+  ingress:
+    enabled: true
 
-# -- Values for [vector helm chart](https://github.com/vectordotdev/helm-charts/tree/develop/charts/vector)
+    extraLabels:
+      app: logging
+
+    hosts:
+      - name: logging.jrzylab.xyz
+        path:
+          - /
+        port: http
+
+    ingressClassName: traefik
+
+    pathType: Prefix
+
 vector:
   enabled: false
 
