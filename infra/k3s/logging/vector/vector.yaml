@@ -10,9 +10,6 @@ containerPorts:
     containerPort: 9598
     protocol: TCP  
 
-nodeSelector:
-  node-role.kubernetes.io/worker: "true"
-
 customConfig:
   data_dir: /var/lib/vector
 
@@ -64,7 +61,7 @@ customConfig:
       inputs:
         - system_logs
       source: |
-        .host = get_hostname!()
+        .host = "$VECTOR_SELF_NODE_NAME"
 
   sinks:
     kube-logs:
