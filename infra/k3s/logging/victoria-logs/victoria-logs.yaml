@@ -1,0 +1,64 @@
+server:
+
+  enabled: true
+
+  replicaCount: 1
+ 
+  retentionPeriod: 7d
+
+  retentionDiskSpaceUsage: 28GiB
+
+  extraArgs:
+    envflag.enable: true
+    envflag.prefix: VM_
+    loggerFormat: json
+    httpListenAddr: :9428
+    http.shutdownDelay: 15s
+
+  # -- Pod's node selector. Details are [here](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector)
+  nodeSelector: 
+    node-role.kubernetes.io/worker: "true"
+
+  persistentVolume:
+    enabled: true
+    name: victoria-logs-nfs-pvc
+    accessModes:
+      - ReadWriteMany
+    storageClassName: nfs-storage
+    # -- Mount path. Server data Persistent Volume mount root path.
+    mountPath: /storage
+    size: 30Gi
+
+  resources:
+    requests:
+      cpu: 250m
+      memory: 256Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+
+  # -- Security context to be added to server pods
+  securityContext:
+    enabled: true
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop:
+        - ALL
+    readOnlyRootFilesystem: true
+
+  service:
+    targetPort: http
+    servicePort: 9428
+    type: NodePort
+
+  # -- Pod's termination grace period in seconds
+  terminationGracePeriodSeconds: 60
+
+# -- Values for [vector helm chart](https://github.com/vectordotdev/helm-charts/tree/develop/charts/vector)
+vector:
+  enabled: false
+
+printNotes: true
+
+dashboards:
+  enabled: false
