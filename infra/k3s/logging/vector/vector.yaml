@@ -45,7 +45,6 @@ customConfig:
       ignore_older_secs: 3600
       line_delimiter: "\n"
 
-
   transforms:
     kubernetes_container_logs:
       type: remap
@@ -57,12 +56,12 @@ customConfig:
         .pod = .kubernetes.pod_name
         .namespace = .kubernetes.pod_namespace
 
-  # sinks:
-  #   logging:
-  #     compression: gzip
+  sinks:
+    logging:
   #     endpoint: http://greptimedb.default:4000
-  #     table: kubernetes_container_logs
-  #     pipeline_name: kubernetes_container_logs
-  #     inputs:
-  #       - kubernetes_container_logs
-  #     type: greptimedb_logs
+        type: elasticsearch
+        compression: gzip
+        pipeline: weather-logs
+        inputs:
+          - kubernetes_container_logs
+          - system_logs
