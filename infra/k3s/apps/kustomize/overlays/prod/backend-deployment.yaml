@@ -1,0 +1,14 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: weather-backend
+spec:
+  template:
+    spec:
+      volumes:
+        - name: sqlitedb
+          nfs:
+            server: nfs.jrzylab.xyz
+            path: /data/app_data/weather-app/prod
+            readOnly: false

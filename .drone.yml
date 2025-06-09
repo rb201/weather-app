@@ -3,8 +3,6 @@ kind: pipeline
 type: docker
 name: weather-app
 
-
-
 steps:
 - name: backend_static_checks
   image: python:3.11
@@ -31,7 +29,7 @@ steps:
     - backend_static_checks
 
 - name: frontend_unit_tests
-  image: python:3.11
+  image: node
   commands:
     - echo "100% sure this code works 100% of the time, every time. No test needed"
   depends_on:
@@ -90,8 +88,8 @@ steps:
     - cd /tmp
     - echo $KUBECONFIG64 > /tmp/kubeconfig64
     - base64 -d /tmp/kubeconfig64 > /tmp/kubeconfig
-    - kubectl --kubeconfig /tmp/kubeconfig set image deployment/weather-backend weather-backend=gitea.jrzylab.xyz/ramon/weather-app/weather-backend:"$VERSION"-dev
-    - kubectl --kubeconfig /tmp/kubeconfig rollout status deployment/weather-backend
+    - kubectl --kubeconfig /tmp/kubeconfig -n dev set image deployment/weather-backend weather-backend=gitea.jrzylab.xyz/ramon/weather-app/weather-backend:"$VERSION"-dev
+    - kubectl --kubeconfig /tmp/kubeconfig -n dev rollout status deployment/weather-backend
   depends_on:
     - build_backend_image
     - build_frontend_image
@@ -107,8 +105,8 @@ steps:
     - cd /tmp
     - echo $KUBECONFIG64 > /tmp/kubeconfig64
     - base64 -d /tmp/kubeconfig64 > /tmp/kubeconfig
-    - kubectl --kubeconfig /tmp/kubeconfig set image deployment/weather-frontend weather-frontend=gitea.jrzylab.xyz/ramon/weather-app/weather-frontend:"$VERSION"-dev
-    - kubectl --kubeconfig /tmp/kubeconfig rollout status deployment/weather-backend
+    - kubectl --kubeconfig /tmp/kubeconfig -n dev set image deployment/weather-frontend weather-frontend=gitea.jrzylab.xyz/ramon/weather-app/weather-frontend:"$VERSION"-dev
+    - kubectl --kubeconfig /tmp/kubeconfig -n dev rollout status deployment/weather-backend
   depends_on:
     - build_backend_image
     - build_frontend_image
@@ -120,7 +118,6 @@ volumes:
 
 trigger:
   branch:
-    - master
     - development
   event:
     - push

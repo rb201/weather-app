@@ -1,0 +1,89 @@
+role: Agent
+
+service:
+  ports:
+    - name: prom-exporter
+      port: 9598
+
+containerPorts:
+  - name: prom-exporter
+    containerPort: 9598
+    protocol: TCP  
+
+customConfig:
+  data_dir: /var/lib/vector
+
+  api:
+    enabled: true
+    address: 0.0.0.0:8686
+    playground: false
+
+  sources:
+    kubernetes_logs:
+      type: kubernetes_logs
+
+    # host_metrics:
+    #   type: host_metrics
+    #   collectors:
+    #     - cpu
+    #     - memory
+    #     - network
+    #     - load
+    #   namespace: host
+    #   scrape_interval_secs: 15
+
+    system_logs:
+      type: file
+      exclude:
+        - /var/log/pods
+      include:
+        - /var/log/boot.log
+        - /var/log/cron
+        - /var/log/firewalld
+        - /var/log/messages
+        - /var/log/secure
+      ignore_older_secs: 3600
+      line_delimiter: "\n"
+
+  transforms:
+    kubernetes_logs_transform:
+      type: remap
+      inputs:
+        - kubernetes_logs
+      source: |
+        .container = .kubernetes.container_name
+        .message = .message
+        .namespace = .kubernetes.pod_namespace
+        .pod = .kubernetes.pod_name
+
+    system_logs_transform:
+      type: remap
+      inputs:
+        - system_logs
+      source: |
+        .host = "$VECTOR_SELF_NODE_NAME"
+
+  sinks:
+    kube-logs:
+      compression: gzip
+      endpoints:
+        - http://vls-victoria-logs-single-server.logging.svc.cluster.local.:9428/insert/elasticsearch
+      inputs:
+        - kubernetes_logs_transform
+      pipeline: weather-logs
+      query:
+        _msg_field: message
+        _stream_fields: namespace,container,pod
+      type: elasticsearch
+
+    sys-logs:
+      compression: gzip
+      endpoints:
+        - http://vls-victoria-logs-single-server.logging.svc.cluster.local.:9428/insert/elasticsearch
+      inputs:
+        - system_logs_transform
+      pipeline: weather-logs
+      query:
+        _msg_field: message
+        _stream_fields: host
+      type: elasticsearch

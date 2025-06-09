@@ -19,3 +19,6 @@
 
 # Misc
 .vscode
+*.bak
+*.ref.yaml
+*notes.txt

@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: weather-backend
+spec:
+  selector:
+    matchLabels:
+      app: weather
+      tier: backend
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: weather
+        tier: backend
+    spec:
+      containers:
+        - name: weather-backend
+          image: gitea.jrzylab.xyz/ramon/weather-app/weather-backend
+          ports:
+            - containerPort: 8000
+              name: backend-port
+          env:
+            - name: API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: backend-api-token
+                  key: token
+          resources:
+            requests:
+              memory: 256Mi
+              cpu: 250m
+            limits:
+              memory: 512Mi
+              cpu: 500m
+          volumeMounts:
+            - name: sqlitedb
+              mountPath: /data
+      imagePullSecrets:
+        - name: registry-login
+      nodeSelector:
+        node-role.kubernetes.io/worker: "true"
