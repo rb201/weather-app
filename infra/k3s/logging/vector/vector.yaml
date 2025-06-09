@@ -10,6 +10,9 @@ containerPorts:
     containerPort: 9598
     protocol: TCP  
 
+nodeSelector:
+  node-role.kubernetes.io/worker: "true"
+
 customConfig:
   data_dir: /var/lib/vector
 
@@ -51,17 +54,22 @@ customConfig:
       inputs:
         - kubernetes_logs
       source: |
-        .message = .message
         .container = .kubernetes.container_name
-        .pod = .kubernetes.pod_name
+        .host = .kubernetes.pod_node_name
+        .message = .message
         .namespace = .kubernetes.pod_namespace
+        .pod = .kubernetes.pod_name
 
   sinks:
     logging:
-  #     endpoint: http://greptimedb.default:4000
-        type: elasticsearch
-        compression: gzip
-        pipeline: weather-logs
-        inputs:
-          - kubernetes_container_logs
-          - system_logs
+      compression: gzip
+      endpoints:
+        - http://vls-victoria-logs-single-server.logging.svc.cluster.local.:9428/insert/elasticsearch
+      inputs:
+        - kubernetes_container_logs
+        - system_logs
+      pipeline: weather-logs
+      query:
+        _msg_field: message
+        _stream_fields: host,container,namespace
+      type: elasticsearch
