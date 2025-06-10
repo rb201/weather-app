@@ -140,6 +140,8 @@ steps:
     PASSWORD:
       from_secret: GITEA_PASSWORD
   commands:
+    - env
+    - echo "$USERNAME"
     - echo "$PASSWORD" | docker login --username "$USERNAME" gitea.jrzylab.xyz --password-stdin
     - cd backend/
     - VERSION=`cat VERSION`
