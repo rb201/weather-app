@@ -38,11 +38,5 @@ spec:
               mountPath: /data
       imagePullSecrets:
         - name: registry-login
-      volumes:
-        - name: sqlitedb
-          nfs:
-            server: nfs.jrzylab.xyz
-            path: /data/app_data/weather-app
-            readOnly: false
       nodeSelector:
         node-role.kubernetes.io/worker: "true"
