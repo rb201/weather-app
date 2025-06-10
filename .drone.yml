@@ -163,6 +163,11 @@ steps:
     - docker tag gitea.jrzylab.xyz/ramon/weather-app/weather-frontend:"$VERSION"-dev gitea.jrzylab.xyz/ramon/weather-app/weather-frontend:"$VERSION"
     - docker push gitea.jrzylab.xyz/ramon/weather-app/weather-frontend:"$VERSION"
 
+volumes:
+- name: dockersock
+  host:
+    path: /var/run/docker.sock
+
 trigger:
   branch:
     - master
