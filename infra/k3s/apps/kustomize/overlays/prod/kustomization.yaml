@@ -22,4 +22,3 @@ patches:
   - path: backend-deployment.yaml
   - path: frontend-deployment.yaml
   - path: ingress.yaml
-  - path: secrets.yaml
