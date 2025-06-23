@@ -6,7 +6,7 @@ metadata:
   labels:
     env: prod
 spec:
-  project: weather
+  project: default
   destination:
     server: https://kubernetes.default.svc
     namespace: prod
