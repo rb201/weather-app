@@ -22,3 +22,5 @@
 *.bak
 *.ref.yaml
 *notes.txt
+
+infra/k3s/apps/kustomize/base/unsealed-secret.yaml
