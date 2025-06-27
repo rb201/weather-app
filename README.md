@@ -13,13 +13,10 @@ The idea was to just get started and not over-think the project. I made the effo
 
 ### Backend
 
-##### K3S
-[k3s](https://k3s.io/) is said to be designed for resource-constrained env. Super simple to get up and running. A plus was that Traefik is used by default, which I leverage with minimal extra config. All my traffic goes to the Traefik loadbalancer that then routes to either backend or frontend. This alleviated CORS issues
-
-##### Sqlite
+##### Database
 SQLite is my database as requires basically nothing to get started. I had initially considered to move to PostGres after the project gets going, but I decided to stay with it. It is currently mounted via PV/NFS, and i would like to test for performance and itegreity. But I haven't done that yet as of writing this.
 
-##### FastAPI
+##### API
 [FastAPI](https://fastapi.tiangolo.com/)
 
 
@@ -32,6 +29,11 @@ My entire project is on my home network, unsegmented. I limited the DHCP assignm
 
 ##### LoadBalancer
 K3s has a default load-balancer called ServiceLB, but I could not manage to get it to work. I disabled it and installed [MetalLB](https://metallb.io/).
+
+
+### Orchestrator
+##### K3S
+[k3s](https://k3s.io/) is said to be designed for resource-constrained env. Super simple to get up and running. A plus was that Traefik is used by default, which I leverage with minimal extra config. All my traffic goes to the Traefik loadbalancer that then routes to either backend or frontend. This alleviated CORS issues
 
 ### CI/CD
 #### Repo
