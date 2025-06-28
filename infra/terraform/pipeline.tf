@@ -23,19 +23,20 @@ resource "aws_codebuild_project" "backend_sc" {
 
   environment {
     compute_type = "BUILD_GENERAL1_SMALL"
-    image        = "aws/codebuild/amazonlinux2-x86_64-standard:4.0"
+    image        = "aws/codebuild/amazonlinux2-x86_64-standard:5.0"
     type         = "LINUX_CONTAINER"
   }
 
   logs_config {
     cloudwatch_logs {
       group_name  = "weather-app"
+      status = "ENABLED"
       stream_name = "backend-static-checks"
     }
   }
 
   source {
-    buildspec = "infra/terraform/buildspecs/backend-static-check.yml"
+    buildspec = "infra/terraform/buildspecs/backend-static-checks.yml"
     type      = "CODEPIPELINE"
   }
 
@@ -61,15 +62,16 @@ resource "aws_codepipeline" "weather_pipeline" {
     action {
       category         = "Source"
       name             = "Source"
-      owner            = "AWS"
+      owner            = "ThirdParty"
       output_artifacts = ["source_output"]
-      provider         = "CodeStarSourceConnection"
+      provider         = "GitHub"
       version          = "1"
 
       configuration = {
-        BranchName       = "development"
-        ConnectionArn    = aws_codestarconnections_connection.github.arn
-        FullRepositoryId = "rb201/weather-app"
+        Branch     = "development"
+        Owner      = "rb201"
+        Repo       = "weather-app"
+        OAuthToken = "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"
       }
     }
   }
@@ -97,7 +99,7 @@ resource "aws_codepipeline" "weather_pipeline" {
 ######
 
 resource "aws_s3_bucket" "codepipeline_bucket" {
-  bucket = "weather-codepipeline"
+  bucket = "rb-weather-codepipeline"
 }
 
 
@@ -127,10 +129,23 @@ data "aws_iam_policy_document" "codebuild_assume_role" {
   }
 }
 
+data "aws_iam_policy_document" "codebuild_policy" {
+  statement {
+    effect = "Allow"
+    actions = [
+      "logs:CreateLogGroup",
+      "logs:CreateLogStream",
+      "s3:GetObject",
+    ]
+    resources = ["*"]
+  }
+}
+
 data "aws_iam_policy_document" "codepipeline_policy" {
   statement {
     effect = "Allow"
     actions = [
+      "codebuild:BatchGetBuilds",
       "codebuild:StartBuild",
       "codecommit:GetBranch",
     ]
@@ -140,18 +155,17 @@ data "aws_iam_policy_document" "codepipeline_policy" {
   statement {
     effect = "Allow"
     actions = [
-      "codeconnections:UseConnection",
+      "s3:GetObject",
+      "s3:PutObject",
     ]
-    resources = ["*"]
+    resources = ["arn:aws:s3:::rb-weather-codepipeline/*"]
   }
+}
 
-  statement {
-    effect = "Allow"
-    actions = [
-      "s3:GetObjects",
-    ]
-    resources = [aws_s3_bucket.codepipeline_bucket.arn]
-  }
+resource "aws_iam_policy" "codebuild_policy" {
+  name        = "codebuild-policy"
+  description = "Allowed permissions for CodeBuild"
+  policy      = data.aws_iam_policy_document.codebuild_policy.json
 }
 
 resource "aws_iam_policy" "codepipeline_policy" {
@@ -173,4 +187,9 @@ resource "aws_iam_role" "codebuild_role" {
 resource "aws_iam_role_policy_attachment" "codepipeline_role_attachment" {
   role       = aws_iam_role.pipeline_role.name
   policy_arn = aws_iam_policy.codepipeline_policy.arn
+}
+
+resource "aws_iam_role_policy_attachment" "codebuild_role_attachment" {
+  role       = aws_iam_role.codebuild_role.name
+  policy_arn = aws_iam_policy.codebuild_policy.arn
 }

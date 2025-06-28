@@ -3,10 +3,8 @@ version: 0.2
 phases:
   install:
     runtime-versions:
-      python: 3.12
+      python: 3.10
     commands:
-      - echo $CODEBUILD_SRC_DIR
-      - pwd
       - pip install -r backend/requirements-dev.txt
       - pip install -r backend/requirements.txt
     
