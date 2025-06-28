@@ -1,14 +1,10 @@
 ##########
 # SOURCE #
 ##########
-resource "aws_codecommit_repository" "repo" {
-  repository_name = "Weather"
-  description     = "Weather app repo"
-  default_branch  = "development"
 
-  tags = {
-    Name = "jrzyproj"
-  }
+resource "aws_codestarconnections_connection" "github" {
+  name          = "github"
+  provider_type = "GitHub"
 }
 
 #############
@@ -19,10 +15,10 @@ resource "aws_codebuild_project" "backend_sc" {
   name          = "weather-backend-static-check"
   description   = "Static analysis for backend"
   build_timeout = 5
-  service_role  = ""
+  service_role  = aws_iam_role.codebuild_role.arn
 
   artifacts {
-    type = "NO_ARTIFACTS"
+    type = "CODEPIPELINE"
   }
 
   environment {
@@ -39,8 +35,8 @@ resource "aws_codebuild_project" "backend_sc" {
   }
 
   source {
-    type      = "CODECOMMIT"
-    buildspec = "infra/terraform/buildspecs/backend-static-check.sh"
+    buildspec = "infra/terraform/buildspecs/backend-static-check.yml"
+    type      = "CODEPIPELINE"
   }
 
   tags = {
@@ -57,7 +53,7 @@ resource "aws_codepipeline" "weather_pipeline" {
     type     = "S3"
   }
   name     = "weather_pipeline"
-  role_arn = ""
+  role_arn = aws_iam_role.pipeline_role.arn
 
   stage {
     name = "Source"
@@ -67,13 +63,13 @@ resource "aws_codepipeline" "weather_pipeline" {
       name             = "Source"
       owner            = "AWS"
       output_artifacts = ["source_output"]
-      provider         = "CodeCommit"
-      version          = "v2"
+      provider         = "CodeStarSourceConnection"
+      version          = "1"
 
       configuration = {
-        RepositoryName       = aws_codecommit_repository.repo.repository_id
-        BranchName           = "development"
-        PollForSourceChanges = true
+        BranchName       = "development"
+        ConnectionArn    = aws_codestarconnections_connection.github.arn
+        FullRepositoryId = "rb201/weather-app"
       }
     }
   }
@@ -87,7 +83,7 @@ resource "aws_codepipeline" "weather_pipeline" {
       name            = "Build"
       owner           = "AWS"
       provider        = "CodeBuild"
-      version         = "v2"
+      version         = "1"
 
       configuration = {
         ProjectName = aws_codebuild_project.backend_sc.name
@@ -120,21 +116,41 @@ data "aws_iam_policy_document" "codepipeline_assume_role" {
   }
 }
 
+data "aws_iam_policy_document" "codebuild_assume_role" {
+  statement {
+    effect = "Allow"
+    principals {
+      type        = "Service"
+      identifiers = ["codebuild.amazonaws.com"]
+    }
+    actions = ["sts:AssumeRole"]
+  }
+}
+
 data "aws_iam_policy_document" "codepipeline_policy" {
+  statement {
+    effect = "Allow"
+    actions = [
+      "codebuild:StartBuild",
+      "codecommit:GetBranch",
+    ]
+    resources = ["*"]
+  }
+
+  statement {
+    effect = "Allow"
+    actions = [
+      "codeconnections:UseConnection",
+    ]
+    resources = ["*"]
+  }
+
   statement {
     effect = "Allow"
     actions = [
       "s3:GetObjects",
     ]
     resources = [aws_s3_bucket.codepipeline_bucket.arn]
-  }
-
-  statement {
-    effect = "Allow"
-    actions = [
-      "codebuild:StartBuild",
-    ]
-    resources = []
   }
 }
 
@@ -147,6 +163,11 @@ resource "aws_iam_policy" "codepipeline_policy" {
 resource "aws_iam_role" "pipeline_role" {
   name               = "weather-pipeline-role"
   assume_role_policy = data.aws_iam_policy_document.codepipeline_assume_role.json
+}
+
+resource "aws_iam_role" "codebuild_role" {
+  name               = "weather-codebuild-role"
+  assume_role_policy = data.aws_iam_policy_document.codebuild_assume_role.json
 }
 
 resource "aws_iam_role_policy_attachment" "codepipeline_role_attachment" {
