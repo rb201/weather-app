@@ -11,37 +11,70 @@ resource "aws_codestarconnections_connection" "github" {
 # CODEBUILD #
 #############
 
-resource "aws_codebuild_project" "backend_sc" {
-  name          = "weather-backend-static-check"
-  description   = "Static analysis for backend"
-  build_timeout = 5
-  service_role  = aws_iam_role.codebuild_role.arn
+# resource "aws_codebuild_project" "backend_sc" {
+#   name          = "weather-backend-static-check"
+#   description   = "Static analysis for backend"
+#   build_timeout = 5
+#   service_role  = aws_iam_role.codebuild_role.arn
 
-  artifacts {
-    type = "CODEPIPELINE"
-  }
+#   artifacts {
+#     type = "CODEPIPELINE"
+#   }
 
-  environment {
-    compute_type = "BUILD_GENERAL1_SMALL"
-    image        = "aws/codebuild/amazonlinux2-x86_64-standard:5.0"
-    type         = "LINUX_CONTAINER"
-  }
+#   environment {
+#     compute_type = "BUILD_GENERAL1_SMALL"
+#     image        = "aws/codebuild/amazonlinux2-x86_64-standard:5.0"
+#     type         = "LINUX_CONTAINER"
+#   }
 
-  logs_config {
-    cloudwatch_logs {
-      group_name  = "weather-app"
-      status = "ENABLED"
-      stream_name = "backend-static-checks"
-    }
-  }
+#   logs_config {
+#     cloudwatch_logs {
+#       group_name  = "weather-app"
+#       status = "ENABLED"
+#       stream_name = "backend-static-checks"
+#     }
+#   }
 
-  source {
-    buildspec = "infra/terraform/buildspecs/backend-static-checks.yml"
-    type      = "CODEPIPELINE"
-  }
+#   source {
+#     buildspec = "infra/terraform/buildspecs/backend-static-checks.yml"
+#     type      = "CODEPIPELINE"
+#   }
 
-  tags = {
-    Name = "jrzyproj"
+#   tags = {
+#     Name = "jrzyproj"
+#   }
+# }
+
+
+module "codebuild_backend_static_checks" {
+  source = "./modules/"
+
+  buildspec_file = "infra/terraform/buildspecs/backend-static-checks.yml"
+  codebuild_role = aws_iam_role.codebuild_role.arn
+  project_name = "backend-static-checks"
+  project_desc = "Static analysis for backend"
+}
+
+module "codebuild_backend_unit_test" {
+  source = "./modules/"
+
+  buildspec_file = "infra/terraform/buildspecs/backend-unit-tests.yml"
+  codebuild_role = aws_iam_role.codebuild_role.arn
+  project_name = "unit-tests"
+  project_desc = "Pytest"
+}
+
+module "codebuild_backend_image" {
+  source = "./modules/"
+
+  buildspec_file = "infra/terraform/buildspecs/backend-build-image.yml"
+  codebuild_role = aws_iam_role.codebuild_role.arn
+  project_name = "build-image"
+  project_desc = "Build, tag, and push image to ECR"
+
+  project_env_vars = {
+    "USERNAME" = ""
+    "PASSWORD" = ""
   }
 }
 
@@ -71,7 +104,7 @@ resource "aws_codepipeline" "weather_pipeline" {
         Branch     = "development"
         Owner      = "rb201"
         Repo       = "weather-app"
-        OAuthToken = "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"
+        OAuthToken = ""
       }
     }
   }
@@ -88,7 +121,41 @@ resource "aws_codepipeline" "weather_pipeline" {
       version         = "1"
 
       configuration = {
-        ProjectName = aws_codebuild_project.backend_sc.name
+        ProjectName = module.codebuild_backend_unit_test.project_name
+      }
+    }
+  }
+
+  stage {
+    name = "Test"
+
+    action {
+      category        = "Test"
+      input_artifacts = ["source_output"]
+      name            = "Build"
+      owner           = "AWS"
+      provider        = "CodeBuild"
+      version         = "1"
+
+      configuration = {
+        ProjectName = module.codebuild_backend_unit_test.project_name
+      }
+    }
+  }
+
+  stage {
+    name = "Build_And_Push_Image"
+
+    action {
+      category        = "Build"
+      input_artifacts = ["source_output"]
+      name            = "Build"
+      owner           = "AWS"
+      provider        = "CodeBuild"
+      version         = "1"
+
+      configuration = {
+        ProjectName = module.codebuild_backend_image.project_name
       }
     }
   }
@@ -107,90 +174,3 @@ resource "aws_s3_bucket" "codepipeline_bucket" {
 # IAM #
 #######
 
-data "aws_iam_policy_document" "codepipeline_assume_role" {
-  statement {
-    effect = "Allow"
-    principals {
-      type        = "Service"
-      identifiers = ["codepipeline.amazonaws.com"]
-    }
-    actions = ["sts:AssumeRole"]
-  }
-}
-
-data "aws_iam_policy_document" "codebuild_assume_role" {
-  statement {
-    effect = "Allow"
-    principals {
-      type        = "Service"
-      identifiers = ["codebuild.amazonaws.com"]
-    }
-    actions = ["sts:AssumeRole"]
-  }
-}
-
-data "aws_iam_policy_document" "codebuild_policy" {
-  statement {
-    effect = "Allow"
-    actions = [
-      "logs:CreateLogGroup",
-      "logs:CreateLogStream",
-      "logs:PutLogEvents",
-      "s3:GetObject",
-    ]
-    resources = ["*"]
-  }
-}
-
-data "aws_iam_policy_document" "codepipeline_policy" {
-  statement {
-    effect = "Allow"
-    actions = [
-      "codebuild:BatchGetBuilds",
-      "codebuild:StartBuild",
-      "codecommit:GetBranch",
-    ]
-    resources = ["*"]
-  }
-
-  statement {
-    effect = "Allow"
-    actions = [
-      "s3:GetObject",
-      "s3:PutObject",
-    ]
-    resources = ["arn:aws:s3:::rb-weather-codepipeline/*"]
-  }
-}
-
-resource "aws_iam_policy" "codebuild_policy" {
-  name        = "codebuild-policy"
-  description = "Allowed permissions for CodeBuild"
-  policy      = data.aws_iam_policy_document.codebuild_policy.json
-}
-
-resource "aws_iam_policy" "codepipeline_policy" {
-  name        = "codepipeline-policy"
-  description = "Allowed permissions for CodePipeline"
-  policy      = data.aws_iam_policy_document.codepipeline_policy.json
-}
-
-resource "aws_iam_role" "pipeline_role" {
-  name               = "weather-pipeline-role"
-  assume_role_policy = data.aws_iam_policy_document.codepipeline_assume_role.json
-}
-
-resource "aws_iam_role" "codebuild_role" {
-  name               = "weather-codebuild-role"
-  assume_role_policy = data.aws_iam_policy_document.codebuild_assume_role.json
-}
-
-resource "aws_iam_role_policy_attachment" "codepipeline_role_attachment" {
-  role       = aws_iam_role.pipeline_role.name
-  policy_arn = aws_iam_policy.codepipeline_policy.arn
-}
-
-resource "aws_iam_role_policy_attachment" "codebuild_role_attachment" {
-  role       = aws_iam_role.codebuild_role.name
-  policy_arn = aws_iam_policy.codebuild_policy.arn
-}

@@ -10,12 +10,3 @@ terraform {
 provider "aws" {
   region = "us-east-2"
 }
-
-# resource "aws_instance" "eks_worder_node" {
-#     ami = ""
-#     instance_type = "t3.micro"
-
-#     tags = {
-#         Name = ""
-#     }
-# }
