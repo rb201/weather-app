@@ -1,0 +1,18 @@
+version: 0.2
+        
+phases:  
+  pre_build:
+    commands:
+      - echo "$PASSWORD" | docker login --username "$USERNAME" gitea.jrzylab.xyz --password-stdin
+
+  build:
+    commands:
+      - cd backend/
+      - VERSION=`cat VERSION`
+      - docker build -t gitea.jrzylab.xyz/ramon/weather-app/weather-backend:"$VERSION"-dev .
+
+  post_build:
+    commands:
+      - docker tag gitea.jrzylab.xyz/ramon/weather-app/weather-backend:"$VERSION"-dev gitea.jrzylab.xyz/ramon/weather-app/weather-backend:latest-dev
+      - docker push gitea.jrzylab.xyz/ramon/weather-app/weather-backend:"$VERSION"-dev
+      - docker push gitea.jrzylab.xyz/ramon/weather-app/weather-backend:latest-dev
