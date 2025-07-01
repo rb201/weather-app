@@ -5,8 +5,8 @@ phases:
     runtime-versions:
       python: 3.10
     commands:
-      - pip install -r backend/requirements-dev.txt
       - pip install -r backend/requirements.txt
+      - pip install -r backend/tests/requirements.txt
     
   build:
     commands:
