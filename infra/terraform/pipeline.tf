@@ -110,29 +110,29 @@ resource "aws_codepipeline" "weather_pipeline" {
   }
 
   stage {
-    name = "Build"
+    name = "Static_Checks"
 
     action {
-      category        = "Build"
+      category        = "Test"
       input_artifacts = ["source_output"]
-      name            = "Build"
+      name            = "Static_Checks"
       owner           = "AWS"
       provider        = "CodeBuild"
       version         = "1"
 
       configuration = {
-        ProjectName = module.codebuild_backend_unit_test.project_name
+        ProjectName = module.codebuild_backend_static_checks.project_name
       }
     }
   }
 
   stage {
-    name = "Test"
+    name = "Unit_Test"
 
     action {
       category        = "Test"
       input_artifacts = ["source_output"]
-      name            = "Build"
+      name            = "Unit_Test"
       owner           = "AWS"
       provider        = "CodeBuild"
       version         = "1"
@@ -174,3 +174,6 @@ resource "aws_s3_bucket" "codepipeline_bucket" {
 # IAM #
 #######
 
+resource "aws_ecr_repository" "container_registry" {
+  name = "weather"
+}
