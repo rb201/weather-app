@@ -12,6 +12,6 @@ phases:
 
   post_build:
     commands:
-      - docker tag 849354442967.dkr.ecr.us-east-2.amazonaws.com/weather-backend:"$VERSION"-dev 849354442967.dkr.ecr.us-east-2.amazonaws.com/weather-backend:latest-dev
-      - docker push 849354442967.dkr.ecr.us-east-2.amazonaws.com/weather-backend:"$VERSION"-dev
-      - docker push 849354442967.dkr.ecr.us-east-2.amazonaws.com/weather-backend:latest-dev
+      - docker tag 849354442967.dkr.ecr.us-east-2.amazonaws.com/weather/weather-backend:"$VERSION"-dev 849354442967.dkr.ecr.us-east-2.amazonaws.com/weather/weather-backend:latest-dev
+      - docker push 849354442967.dkr.ecr.us-east-2.amazonaws.com/weather/weather-backend:"$VERSION"-dev
+      - docker push 849354442967.dkr.ecr.us-east-2.amazonaws.com/weather/weather-backend:latest-dev
