@@ -60,6 +60,31 @@ data "aws_iam_policy_document" "codepipeline_policy" {
   }
 }
 
+data "aws_iam_policy_document" "eks_assume_role" {
+  statement {
+    effect = "Allow"
+    principals {
+      type        = "Service"
+      identifiers = ["eks.amazonaws.com"]
+    }
+    actions = [
+      "sts:AssumeRole",
+      "sts:TagSession"
+    ]
+  }
+}
+
+data "aws_iam_policy_document" "eks_node_group_assume_role" {
+  statement {
+    effect = "Allow"
+    principals {
+      type        = "Service"
+      identifiers = ["ec2.amazonaws.com"]
+    }
+    actions = ["sts:AssumeRole"]
+  }
+}
+
 resource "aws_iam_policy" "codebuild_policy" {
   name        = "codebuild-policy"
   description = "Allowed permissions for CodeBuild"
@@ -82,6 +107,17 @@ resource "aws_iam_role" "codebuild_role" {
   assume_role_policy = data.aws_iam_policy_document.codebuild_assume_role.json
 }
 
+resource "aws_iam_role" "eks_role" {
+  name = "eks-cluster-example"
+  assume_role_policy = data.aws_iam_policy_document.eks_assume_role.json
+}
+
+resource "aws_iam_role" "eks_worker_node_group_role" {
+  name = "eks-node-group"
+  assume_role_policy = data.aws_iam_policy_document.eks_node_group_assume_role.json
+
+}
+
 resource "aws_iam_role_policy_attachment" "codepipeline_role_attachment" {
   role       = aws_iam_role.pipeline_role.name
   policy_arn = aws_iam_policy.codepipeline_policy.arn
@@ -91,3 +127,24 @@ resource "aws_iam_role_policy_attachment" "codebuild_role_attachment" {
   role       = aws_iam_role.codebuild_role.name
   policy_arn = aws_iam_policy.codebuild_policy.arn
 }
+
+resource "aws_iam_role_policy_attachment" "eks_policy" {
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEKSClusterPolicy"
+  role       = aws_iam_role.eks_role.name
+}
+
+resource "aws_iam_role_policy_attachment" "eks_node_group_worker_node_policy" {
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy"
+  role       = aws_iam_role.eks_worker_node_group_role.name
+}
+
+resource "aws_iam_role_policy_attachment" "eks_node_group_cni_policy" {
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy"
+  role       = aws_iam_role.eks_worker_node_group_role.name
+}
+
+resource "aws_iam_role_policy_attachment" "eks_node_group_ecr_policy" {
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
+  role       = aws_iam_role.eks_worker_node_group_role.name
+}
+
