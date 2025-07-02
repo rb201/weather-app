@@ -3,16 +3,15 @@ version: 0.2
 phases:  
   pre_build:
     commands:
-      - echo "$PASSWORD" | docker login --username "$USERNAME" gitea.jrzylab.xyz --password-stdin
-
+      - aws ecr get-login-password --region us-east-2 | docker login --username AWS --password-stdin 849354442967.dkr.ecr.us-east-2.amazonaws.com
   build:
     commands:
       - cd backend/
       - VERSION=`cat VERSION`
-      - docker build -t gitea.jrzylab.xyz/ramon/weather-app/weather-backend:"$VERSION"-dev .
+      - docker build -t 849354442967.dkr.ecr.us-east-2.amazonaws.com/weather-backend:"$VERSION"-dev .
 
   post_build:
     commands:
-      - docker tag gitea.jrzylab.xyz/ramon/weather-app/weather-backend:"$VERSION"-dev gitea.jrzylab.xyz/ramon/weather-app/weather-backend:latest-dev
-      - docker push gitea.jrzylab.xyz/ramon/weather-app/weather-backend:"$VERSION"-dev
-      - docker push gitea.jrzylab.xyz/ramon/weather-app/weather-backend:latest-dev
+      - docker tag 849354442967.dkr.ecr.us-east-2.amazonaws.com/weather-backend:"$VERSION"-dev 849354442967.dkr.ecr.us-east-2.amazonaws.com/weather-backend:latest-dev
+      - docker push 849354442967.dkr.ecr.us-east-2.amazonaws.com/weather-backend:"$VERSION"-dev
+      - docker push 849354442967.dkr.ecr.us-east-2.amazonaws.com/weather-backend:latest-dev
