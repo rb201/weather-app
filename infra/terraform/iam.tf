@@ -24,6 +24,8 @@ data "aws_iam_policy_document" "codebuild_policy" {
   statement {
     effect = "Allow"
     actions = [
+      "ecr:GetAuthorizationToken",
+      "ecr:InitiateLayerUpload",
       "logs:CreateLogGroup",
       "logs:CreateLogStream",
       "logs:PutLogEvents",
