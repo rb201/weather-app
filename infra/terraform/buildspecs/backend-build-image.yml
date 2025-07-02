@@ -8,7 +8,7 @@ phases:
     commands:
       - cd backend/
       - VERSION=`cat VERSION`
-      - docker build -t 849354442967.dkr.ecr.us-east-2.amazonaws.com/weather-backend:"$VERSION"-dev .
+      - docker build -t 849354442967.dkr.ecr.us-east-2.amazonaws.com/weather-backend:"$VERSION"-dev . -f Dockerfile-aws
 
   post_build:
     commands:

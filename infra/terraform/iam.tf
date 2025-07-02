@@ -24,8 +24,12 @@ data "aws_iam_policy_document" "codebuild_policy" {
   statement {
     effect = "Allow"
     actions = [
+      "ecr:BatchCheckLayerAvailability",
+      "ecr:CompleteLayerUpload",
       "ecr:GetAuthorizationToken",
       "ecr:InitiateLayerUpload",
+      "ecr:PutImage",
+      "ecr:UploadLayerPart",
       "logs:CreateLogGroup",
       "logs:CreateLogStream",
       "logs:PutLogEvents",
