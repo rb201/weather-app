@@ -1,3 +1,5 @@
+#TODO: github token as secret
+
 ##########
 # SOURCE #
 ##########
@@ -6,45 +8,6 @@ resource "aws_codestarconnections_connection" "github" {
   name          = "github"
   provider_type = "GitHub"
 }
-
-#############
-# CODEBUILD #
-#############
-
-# resource "aws_codebuild_project" "backend_sc" {
-#   name          = "weather-backend-static-check"
-#   description   = "Static analysis for backend"
-#   build_timeout = 5
-#   service_role  = aws_iam_role.codebuild_role.arn
-
-#   artifacts {
-#     type = "CODEPIPELINE"
-#   }
-
-#   environment {
-#     compute_type = "BUILD_GENERAL1_SMALL"
-#     image        = "aws/codebuild/amazonlinux2-x86_64-standard:5.0"
-#     type         = "LINUX_CONTAINER"
-#   }
-
-#   logs_config {
-#     cloudwatch_logs {
-#       group_name  = "weather-app"
-#       status = "ENABLED"
-#       stream_name = "backend-static-checks"
-#     }
-#   }
-
-#   source {
-#     buildspec = "infra/terraform/buildspecs/backend-static-checks.yml"
-#     type      = "CODEPIPELINE"
-#   }
-
-#   tags = {
-#     Name = "jrzyproj"
-#   }
-# }
-
 
 module "codebuild_backend_static_checks" {
   source = "./modules/"
