@@ -12,6 +12,9 @@
 # Env files
 .env
 
+# Terraform
+infra/terraform/.terraform*
+infra/terraform/terraform.tfstate
 
 # React
 **/node_modules
@@ -22,3 +25,5 @@
 *.bak
 *.ref.yaml
 *notes.txt
+
+infra/k3s/apps/kustomize/base/unsealed-secret.yaml
