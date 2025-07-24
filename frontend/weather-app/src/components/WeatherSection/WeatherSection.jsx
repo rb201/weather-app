@@ -1,4 +1,4 @@
-import sunIcon from "../../assets/weather-icons/color/615.png";
+import sunIcon from "../../assets/weather-icons/color/802.png";
 
 import './WeatherSection.css'
 
