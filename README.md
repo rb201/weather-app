@@ -46,6 +46,7 @@ K3s has a default load-balancer called ServiceLB, but I could not manage to get 
 ##### Dev
 Dev runs on every push. This pipeline runs static anaylsis, unit-test, build images, pushes them, and deploys using `kubectl rollout ...`. You can see more details in `.drone.yml`. 'dev' is appended to images.
 ![DroneCI dev pipeline steps](readme-misc/drone-ci-pipeline-steps.png)
+![Kubectl](readme-misc/rollout-stats.png)
 
 
 ##### Prod
