@@ -1,1 +1,1 @@
-project_name_prefix = "wather"
+project_name_prefix = "weather"
