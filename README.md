@@ -1,12 +1,12 @@
 # Project
-This project sole purpose is to refresh my knowledge and understanding of the various technologies and concepts that were part of my work as a devops engineer. I've created an app, but the app was just a means to developing the infrastructure around it - I'm not a software engineer by trade. I started from what I knew, and then researching what was possible outside of what I knew and learned.
+This project sole purpose is to refresh my knowledge and understanding of the various technologies and concepts that were part of my work as a devops engineer. I've created an app, but the app was just a means to developing the infrastructure around it - I'm not a software engineer by trade. I started from what I knew, and then researching what was possible outside of what I learned.
 
-Some of the tech choices were are out of my own interest but never was able to use them professionally, CNCF, or just reading recommendations by users online. Most important factors for implementiion: 1) is it simple to use and get started and 2) is it resource efficient (due to my sever capacity)
+Some of the tech choices were are out of my own interest (but never was able to use them professionally), CNCF, or just reading recommendations by users online. Most important factors for implementiion: 1) is it simple to use and get started and 2) is it resource efficient (due to my sever capacity)
 
 Some of the choices in this project may not make sense at a glance. For example, my Terraform and CDK code basically do the same thing.
 
 ### Agile
-The idea was to just get started and not over-think the project. I made the effort to break down all ideas into workable pieces and to start simple. I could refactor or optimize later, but mort importantly, I had to get started. I had [Vikunja](https://vikunja.io/) already in my homelab, so I just created a new Kanban project there to manage tasks
+The idea was to just get started and not over-think the project. I made the effort to break down all ideas into workable simple pieces. I could refactor or optimize later, but mort importantly, I had to get started. I had [Vikunja](https://vikunja.io/) already in my homelab, so I just created a new Kanban project there to manage tasks
 
 ![Vikunja board](readme-misc/vikunja.png)
 
@@ -14,7 +14,7 @@ The idea was to just get started and not over-think the project. I made the effo
 ### Backend
 
 ##### Database
-SQLite requires basically nothing to get started. I had initially considered to move to PostGres after the project gets going, but I decided to stay with it. It is currently mounted via PV/NFS, and but have not tested for performance and itegreity.
+SQLite requires basically nothing to get started. I had initially considered to move to PostGres after the project gets going, but I decided to stay with it. It is currently mounted via PV/NFS, and but have not tested for performance and itegreity, but so far seems good.
 
 ##### API
 [FastAPI](https://fastapi.tiangolo.com/)
@@ -45,6 +45,7 @@ K3s has a default load-balancer called ServiceLB, but I could not manage to get 
 
 ##### Dev
 Dev runs on every push. This pipeline runs static anaylsis, unit-test, build images, pushes them, and deploys using `kubectl rollout ...`. You can see more details in `.drone.yml`. 'dev' is appended to images.
+![DroneCI dev pipeline steps](readme-misc/drone-ci-pipeline-steps.png)
 
 
 ##### Prod
@@ -85,6 +86,10 @@ I have a real domain and LetsEncrypt autorenews my cert from my registrar NameCh
 #### SSO
 I think all of my apps are using created username/password, but I would like to move to SSO. This is another backlog item
 
+### Backup
+
+I have a shell script that uses [Restic](https://restic.net/) for backups. The script basically goes into the folder of all the apps I am using, performs a incremental backup to an external device. Runs daily and prunes after 14days. This script is not yet fully integrated with this project
+
 ### Documentation
 A lot of information and extra config was learned and needed to get all the moving parts of the project working. I was already hosting [WikiJS](https://js.wiki/), so I used it to document some of the difficulties I came across throughout this project. Example:
 ![WikiJS](readme-misc/wiki-coredns.png)
@@ -101,4 +106,8 @@ I am an even bigger fan of [Terraform](https://developer.hashicorp.com/terraform
 
 
 ##### AWS CDK
-The CDK was used exetensibly at my previous work, so I just wanted to refresh. Although I truly dislike CloudFormation, I did enjoy the power of CDK.
+The CDK (Python) was used exetensibly at my previous work, so I just wanted to refresh. Although I truly dislike CloudFormation, I found AWSCDK quite powerful.
+
+
+### Notes
+This project continues to expand and has a lot of moving pieces - some of which is unfinished - but I can not wait until it is 'finished'. So this will be a work in progress as I start looking for work. Unsurpringly, this project was not easy - there was so much debugging and troubleshooting and research, which can't really be seen from the eyes of a person who looks at this repo for the first time. I hope this repo can display a bit of what I can do

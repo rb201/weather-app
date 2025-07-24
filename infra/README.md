@@ -1,5 +1,5 @@
 ## Ansible
-This folder contains Ansible playbooks I used to setup worker nodes. And some other stuff for my local development
+This folder contains Ansible playbooks I used to setup worker nodes.
 
 ## AWS CDK
 This folder will contain infrastructure deployment using AWS CDK.
