@@ -106,7 +106,7 @@ steps:
     - echo $KUBECONFIG64 > /tmp/kubeconfig64
     - base64 -d /tmp/kubeconfig64 > /tmp/kubeconfig
     - kubectl --kubeconfig /tmp/kubeconfig -n dev set image deployment/weather-frontend weather-frontend=gitea.jrzylab.xyz/ramon/weather-app/weather-frontend:"$VERSION"-dev
-    - kubectl --kubeconfig /tmp/kubeconfig -n dev rollout status deployment/weather-backend
+    - kubectl --kubeconfig /tmp/kubeconfig -n dev rollout status deployment/weather-frontend
   depends_on:
     - build_backend_image
     - build_frontend_image
