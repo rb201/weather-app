@@ -130,7 +130,7 @@ resource "aws_s3_bucket" "codepipeline_bucket" {
 
 
 #######
-# IAM #
+# ECR #
 #######
 
 resource "aws_ecr_repository" "backend_container_registry" {
