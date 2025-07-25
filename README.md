@@ -6,7 +6,7 @@ Some of the tech choices were are out of my own interest (but never was able to 
 Some of the choices in this project may not make sense at a glance. For example, my Terraform and CDK code basically do the same thing.
 
 ### Agile
-The idea was to just get started and not over-think the project. I made the effort to break down all ideas into workable simple pieces. I could refactor or optimize later, but mort importantly, I had to get started. I had [Vikunja](https://vikunja.io/) already in my homelab, so I just created a new Kanban project there to manage tasks
+The idea was to just get started and not over-think the project. I made the effort to break down all ideas into workable simple pieces. I could refactor or optimize later, but most importantly, I had to get started. I had [Vikunja](https://vikunja.io/) already in my homelab, so I just created a new Kanban project there to manage tasks
 
 ![Vikunja board](readme-misc/vikunja.png)
 
@@ -14,7 +14,7 @@ The idea was to just get started and not over-think the project. I made the effo
 ### Backend
 
 ##### Database
-SQLite requires basically nothing to get started. I had initially considered to move to PostGres after the project gets going, but I decided to stay with it. It is currently mounted via PV/NFS, and but have not tested for performance and itegreity, but so far seems good.
+SQLite requires basically nothing to get started. I had initially considered to move to PostGres after the project gets going, but I decided to stay with it. It is currently mounted via PV/NFS, but have not tested for performance and itegreity; so far so good.
 
 ##### API
 [FastAPI](https://fastapi.tiangolo.com/)
@@ -25,7 +25,7 @@ ReactJS was my choice simply becaues i've used it in the past and didn't want to
 
 
 ### Networking
-My entire project is on my home network, unsegmented. I limited the DHCP assignment on my router, and set aside a small block of ip's for my LoadBalancer. I use [Pihole](https://https://pi-hole.net/) as my main DNS, and [NPM](https://nginxproxymanager.com/) to terminate all my entry points; Both were already in my homelab
+The entire project is on my home network, unsegmented. I limited the DHCP assignment on my router, and set aside a small block of ip's for my LoadBalancer. I use [Pihole](https://https://pi-hole.net/) as my main DNS, and [NPM](https://nginxproxymanager.com/) to terminate all my entry points; Both were already in my homelab
 
 ##### LoadBalancer
 K3s has a default load-balancer called ServiceLB, but I could not manage to get it to work. I disabled it and installed [MetalLB](https://metallb.io/).
