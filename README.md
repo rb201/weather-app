@@ -1,7 +1,7 @@
 # Project
 This project sole purpose is to refresh my knowledge and understanding of the various technologies and concepts that were part of my work as a devops engineer. I've created an app, but the app was just a means to developing the infrastructure around it - I'm not a software engineer by trade. I started from what I knew, and then researching what was possible outside of what I learned.
 
-Some of the tech choices were are out of my own interest (but never was able to use them professionally), CNCF, or just reading recommendations by users online. Most important factors for implementiion: 1) is it simple to use and get started and 2) is it resource efficient (due to my sever capacity)
+Some of the tech choices were are out of my own interest (but never was able to use them professionally), CNCF, or just reading recommendations by users online. Most important factors for implemention: 1) is it simple to use and get started and 2) is it resource efficient (due to my sever capacity)
 
 Some of the choices in this project may not make sense at a glance. For example, my Terraform and CDK code basically do the same thing.
 
@@ -110,5 +110,14 @@ I am an even bigger fan of [Terraform](https://developer.hashicorp.com/terraform
 The CDK (Python) was used exetensibly at my previous work, so I just wanted to refresh. Although I truly dislike CloudFormation, I found AWSCDK quite powerful.
 
 
+
+### App
+The app isn't much to look at. The frontend needs a lot of work (fortunately i'm not frontend!), but the backend is functional and much more developed. I went to see if the app was still up in prod, and i notcied it was using an image I had harcdocded some time ago. I made the change in dev, and finally deployed to prod.
+
+| prod (old) | dev (latest) | prod (latest)
+| --- | --- | --- |
+| ![WikiJS](readme-misc/weather-prod.png) | ![dev-latest](readme-misc/weather-dev.png) | ![WikiJS](readme-misc/weather-prod-latest.png) |
+
+
 ### Notes
-This project continues to expand and has a lot of moving pieces - some of which is unfinished - but I can not wait until it is 'finished'. So this will be a work in progress as I start looking for work. Unsurpringly, this project was not easy - there was so much debugging and troubleshooting and research, which can't really be seen from the eyes of a person who looks at this repo for the first time. I hope this repo can display a bit of what I can do
+This project continues to expand and has a lot of moving pieces - some of which is unfinished - but I can not wait until it is 'finished' because I can keep adding to it. So this will be a work in progress as I start looking for work. Unsurpringly, this project was not easy - there was so much debugging and troubleshooting and research, which can't really be seen from the eyes of a person who looks at this repo for the first time. I hope this repo can display a bit of what I can do
