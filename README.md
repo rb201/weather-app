@@ -79,7 +79,7 @@ Using [VictoriaLogs](https://docs.victoriametrics.com/victorialogs/) as it is mu
 
 Drone has it's own secret management that I use for injecting creds for accessing Gitea
 
-[SealedSecrets](https://github.com/bitnami-labs/sealed-secrets) is used to encrypt Secret k8s resource. I seal the docker login to fetch images, and the API token used by the backend. This allows me to store the secrets.yaml in my repo. This approach provided security without much complexity. As I moved to GitOps, I wanted to store all my k8s manifest in git once I moved to GitOps
+[SealedSecrets](https://github.com/bitnami-labs/sealed-secrets) is used to encrypt Secret k8s resource. I seal the docker login to fetch images, and the API token used by the backend. This allows me to store the secrets.yaml in my repo. This approach provided security without much complexity. I wanted to store all my manifest in git as I moved towards GitOps
 
 #### TLS
 I have a real domain and LetsEncrypt autorenews my cert from my registrar NameCheap. But I have not yet set up TLS between internal services
