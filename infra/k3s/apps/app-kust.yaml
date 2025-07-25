@@ -29,7 +29,7 @@ spec:
           patch: |-
             - op: replace
               path: /spec/template/spec/containers/0/image
-              value: gitea.jrzylab.xyz/ramon/weather-app/weather-frontend:0.4.4
+              value: gitea.jrzylab.xyz/ramon/weather-app/weather-frontend:0.4.5
   info:
     - name: 'Weather'
       value: 'https://weather.jrzylaby.xyz'
