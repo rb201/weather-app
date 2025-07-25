@@ -13,7 +13,7 @@ images:
   - name: gitea.jrzylab.xyz/ramon/weather-app/weather-backend
     newTag: 0.5.2
   - name: gitea.jrzylab.xyz/ramon/weather-app/weather-frontend
-    newTag: 0.4.4
+    newTag: 0.4.5
 
 resources:
   - ../../base
