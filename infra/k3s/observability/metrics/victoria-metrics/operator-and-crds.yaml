@@ -43158,13 +43158,21 @@ metadata:
     app.kubernetes.io/managed-by: kustomize
     app.kubernetes.io/name: vm-operator
   name: vm-operator
+<<<<<<< HEAD
   namespace: metrics
+=======
+  namespace: vm
+>>>>>>> cd3b934 (CRD of victoria-metrics)
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
   name: vm-leader-election-role
+<<<<<<< HEAD
   namespace: metrics
+=======
+  namespace: vm
+>>>>>>> cd3b934 (CRD of victoria-metrics)
 rules:
 - apiGroups:
   - ""
@@ -43408,7 +43416,11 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
   name: vm-leader-election-rolebinding
+<<<<<<< HEAD
   namespace: metrics
+=======
+  namespace: vm
+>>>>>>> cd3b934 (CRD of victoria-metrics)
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: Role
@@ -43416,7 +43428,11 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: vm-operator
+<<<<<<< HEAD
   namespace: metrics
+=======
+  namespace: vm
+>>>>>>> cd3b934 (CRD of victoria-metrics)
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
@@ -43429,7 +43445,11 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: vm-operator
+<<<<<<< HEAD
   namespace: metrics
+=======
+  namespace: vm
+>>>>>>> cd3b934 (CRD of victoria-metrics)
 ---
 apiVersion: v1
 kind: Service
@@ -43440,7 +43460,11 @@ metadata:
     app.kubernetes.io/name: victoria-metrics-operator
     control-plane: vm-operator
   name: vm-operator-metrics-service
+<<<<<<< HEAD
   namespace: metrics
+=======
+  namespace: vm
+>>>>>>> cd3b934 (CRD of victoria-metrics)
 spec:
   ports:
   - name: http
@@ -43459,7 +43483,11 @@ metadata:
     app.kubernetes.io/name: victoria-metrics-operator
     control-plane: vm-operator
   name: vm-operator
+<<<<<<< HEAD
   namespace: metrics
+=======
+  namespace: vm
+>>>>>>> cd3b934 (CRD of victoria-metrics)
 spec:
   replicas: 1
   selector:
@@ -43542,7 +43570,11 @@ metadata:
     app.kubernetes.io/managed-by: kustomize
     app.kubernetes.io/name: test
   name: vm-allow-metrics-traffic
+<<<<<<< HEAD
   namespace: metrics
+=======
+  namespace: vm
+>>>>>>> cd3b934 (CRD of victoria-metrics)
 spec:
   ingress:
   - from:
@@ -43566,7 +43598,11 @@ metadata:
     app.kubernetes.io/managed-by: kustomize
     app.kubernetes.io/name: vm-operator
   name: vm-allow-webhook-traffic
+<<<<<<< HEAD
   namespace: metrics
+=======
+  namespace: vm
+>>>>>>> cd3b934 (CRD of victoria-metrics)
 spec:
   ingress:
   - from:
