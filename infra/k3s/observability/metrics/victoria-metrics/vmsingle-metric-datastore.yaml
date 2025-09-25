@@ -1,0 +1,13 @@
+apiVersion: operator.victoriametrics.com/v1beta1
+
+kind: VMSingle
+
+metadata:
+  labels:
+    env: prod
+  name: datastore
+  namespace: metrics
+
+spec:
+  nodeSelector:
+    kubernetes.io/hostname: jump.jrzylab.xyz

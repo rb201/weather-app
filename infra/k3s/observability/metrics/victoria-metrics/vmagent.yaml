@@ -1,0 +1,14 @@
+apiVersion: operator.victoriametrics.com/v1beta1
+
+kind: VMAgent
+
+metadata:
+  labels:
+    env: prod
+  name: agent
+  namespace: metrics
+
+spec:
+  selectAllByDefault: true
+  remoteWrite:
+    - url: "http://vmsingle-metric-datastore.vm.svc:8428/api/v1/write"
