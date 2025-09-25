@@ -5,10 +5,18 @@ kind: VMAgent
 metadata:
   labels:
     env: prod
+<<<<<<< HEAD
   name: scraper
+=======
+  name: agent
+>>>>>>> f056bf0 (Victoria-metrics related)
   namespace: metrics
 
 spec:
   selectAllByDefault: true
   remoteWrite:
+<<<<<<< HEAD
     - url: "http://vmsingle-datastore.metrics.svc:8428/api/v1/write"
+=======
+    - url: "http://vmsingle-metric-datastore.vm.svc:8428/api/v1/write"
+>>>>>>> f056bf0 (Victoria-metrics related)

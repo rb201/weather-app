@@ -32,4 +32,3 @@ spec:
                 name: vmsingle-datastore
                 port:
                   number: 8428
-          
