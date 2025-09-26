@@ -12,17 +12,24 @@ spec:
       http:
         paths:
           - pathType: Prefix
-            path: /
-            backend:
-              service:
-                name: vmsingle-datastore
-                port:
-                  number: 8428
-          - pathType: Prefix
             path: /metrics
             backend:
               service:
                 name: vm-operator-metrics-service
                 port:
                   number: 8080
+          - pathType: Prefix
+            path: /targets
+            backend:
+              service:
+                name: vmagent-scraper
+                port:
+                  number: 8429
+          - pathType: Prefix
+            path: /
+            backend:
+              service:
+                name: vmsingle-datastore
+                port:
+                  number: 8428
           
