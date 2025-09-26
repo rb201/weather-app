@@ -5,10 +5,10 @@ kind: VMAgent
 metadata:
   labels:
     env: prod
-  name: agent
+  name: scraper
   namespace: metrics
 
 spec:
   selectAllByDefault: true
   remoteWrite:
-    - url: "http://vmsingle-metric-datastore.vm.svc:8428/api/v1/write"
+    - url: "http://vmsingle-datastore.metrics.svc:8428/api/v1/write"
