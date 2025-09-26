@@ -1,0 +1,21 @@
+# ---
+# apiVersion: operator.victoriametrics.com/v1beta1
+# kind: VMPodScrape
+# metadata:
+#   name: cadvisor-scraper
+#   namespace: metrics
+# spec:
+#   # namespaceSelector:
+#   #   matchNames:
+#   #     - kube-system
+#   # bearerTokenFile: "/var/run/secrets/kubernetes.io/serviceaccount/token"
+#   podMetricsEndpoints:
+#     - path: /metrics/cadvisor
+#       portNumber: 10250
+#       scheme: https
+#   selector:
+#     matchLabels:
+#       k8s-app: metrics-server
+#   # tlsConfig:
+#   #   # insecureSkipVerify: true
+#   #   caFile: "/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"

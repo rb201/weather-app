@@ -1,0 +1,33 @@
+---
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMServiceScrape
+metadata:
+  name: kube-state-metrics
+  namespace: metrics
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: kube-state-metrics
+  namespaceSelector:
+    matchNames: 
+      - metrics
+  endpoints:
+    - port: http
+
+# ---
+# apiVersion: operator.victoriametrics.com/v1beta1
+# kind: VMServiceScrape
+# metadata:
+#   name: api-server
+#   namespace: metrics
+# spec:
+#   selector:
+#     matchLabels:
+#       app.kubernetes.io/name: kube-state-metrics
+#   namespaceSelector:
+#     matchNames: 
+#       - metrics
+#   endpoints:
+#     - port: http
+
+# kube-state-metrics.metrics.svc.cluster.local:8080/metrics
