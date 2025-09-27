@@ -69,6 +69,8 @@ Using [VictoriaLogs](https://docs.victoriametrics.com/victorialogs/) as it is mu
 #### Metrics
 <\WIP>
 
+#### Tracing
+<\WIP>
 
 #### Alerting
 <\WIP>
@@ -85,6 +87,9 @@ Drone has it's own secret management that I use for injecting creds for accessin
 I have a real domain and LetsEncrypt autorenews my cert from my registrar NameCheap. But I have not yet set up TLS between internal services <\WIP>
 
 #### SSO
+<\WIP>
+
+#### Authentication/Authorization
 <\WIP>
 
 ### Backup
