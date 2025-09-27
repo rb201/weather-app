@@ -82,7 +82,7 @@ Drone has it's own secret management that I use for injecting creds for accessin
 [SealedSecrets](https://github.com/bitnami-labs/sealed-secrets) is used to encrypt Secret k8s resource. I seal the docker login to fetch images, and the API token used by the backend. This allows me to store the secrets.yaml in my repo. This approach provided security without much complexity. I wanted to store all my manifest in git as I moved towards GitOps
 
 #### TLS
-I have a real domain and LetsEncrypt autorenews my cert from my registrar NameCheap. But I have not yet set up TLS between internal services
+I have a real domain and LetsEncrypt autorenews my cert from my registrar NameCheap. But I have not yet set up TLS between internal services <\WIP>
 
 #### SSO
 <\WIP>
