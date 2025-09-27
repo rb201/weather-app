@@ -3,7 +3,7 @@ This project sole purpose is to refresh my knowledge and understanding of the va
 
 Some of the tech choices were are out of my own interest (but never was able to use them professionally), CNCF, or just reading recommendations by users online. Most important factors for implemention: 1) is it simple to use and get started and 2) is it resource efficient (due to my sever capacity)
 
-Some of the choices in this project may not make sense at a glance. For example, my Terraform and CDK code basically do the same thing.
+There is some redundancy in this repo. For example, my Terraform and CDK code basically do the same thing.
 
 ### Agile
 The idea was to just get started and not over-think the project. I made the effort to break down all ideas into workable simple pieces. I could refactor or optimize later, but most importantly, I had to get started. I had [Vikunja](https://vikunja.io/) already in my homelab, so I just created a new Kanban project there to manage tasks
@@ -85,7 +85,7 @@ Drone has it's own secret management that I use for injecting creds for accessin
 I have a real domain and LetsEncrypt autorenews my cert from my registrar NameCheap. But I have not yet set up TLS between internal services
 
 #### SSO
-I think all of my apps are using created username/password, but I would like to move to SSO. This is another backlog item
+<\WIP>
 
 ### Backup
 
@@ -99,15 +99,15 @@ A lot of information and extra config was learned and needed to get all the movi
 ### ConfigMgmt
 
 ##### Ansible
-I am a big fan of [Ansible](https://docs.ansible.com/ansible/latest/index.html). I had a small opportunity to setup k3s cluster nodes
+[Ansible](https://docs.ansible.com/ansible/latest/index.html). Used for some minor k3s cluster nodes setup
 
 
 ##### Terraform
-I am an even bigger fan of [Terraform](https://developer.hashicorp.com/terraform). I've used it for deploying infrastructure on AWS
+Terraform](https://developer.hashicorp.com/terraform) used for deploying infrastructure on AWS (<\WIP>)
 
 
 ##### AWS CDK
-The CDK (Python) was used exetensibly at my previous work, so I just wanted to refresh. Although I truly dislike CloudFormation, I found AWSCDK quite powerful.
+The CDK (Python) was used exetensibly at my previous work, so I just wanted to refresh. I found AWSCDK quite powerful.
 
 
 
@@ -120,4 +120,4 @@ The app isn't much to look at. The frontend needs a lot of work (fortunately i'm
 
 
 ### Notes
-This project continues to expand and has a lot of moving pieces - some of which is unfinished - but I can not wait until it is 'finished' because I can keep adding to it. So this will be a work in progress as I start looking for work. Unsurpringly, this project was not easy - there was so much debugging and troubleshooting and research, which can't really be seen from the eyes of a person who looks at this repo for the first time. I hope this repo can display a bit of what I can do
+This project continues to expand and has a lot of moving pieces - much of which is unfinished. So this will be a work in progress. Unsurpringly, this project was not easy - there was so much debugging and troubleshooting and research !
