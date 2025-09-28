@@ -18,6 +18,23 @@ spec:
 apiVersion: operator.victoriametrics.com/v1beta1
 kind: VMServiceScrape
 metadata:
+  name: node-exporter
+  namespace: metrics
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: exporter
+      app.kubernetes.io/name: node-exporter
+  namespaceSelector:
+    matchNames:
+      - metrics
+  endpoints:
+    - port: node-exporter
+
+---
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMServiceScrape
+metadata:
   name: api-server-metrics
   namespace: metrics
 spec:
